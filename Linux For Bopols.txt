@@ -1,0 +1,11 @@
+### Create LVM logical volume
+	# lvcreate -L 10G -n lvappldb2 vgdata
+	# mkfs.ext3 /dev/vgdata/lvappldb2
+	# tune2fs -c -1 /dev/vgdata/lvappldb2
+
+	
+	
+### Account Setup
+	# useradd -m tmpadm
+	# chage -M 99999 tmpadm
+	# passwd tmpadm

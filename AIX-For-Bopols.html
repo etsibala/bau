@@ -1,14 +1,14 @@
 <html>
 <head>
-	<title> TAE </title>
+	<title> AIX For Bopols </title>
 </head>
 <body>
 <br>
-### Creating a logical volumes
+<b>### Creating a logical volumes</b>
 1. Create the logiacal volume /nsr
 	# crfs -v jfs2 -g rootvg  -m /nsr -a size=2G -A yes 
-<br>
-### Extend VG filesystem
+<br><br>
+<b>### Extend VG filesystem</b>
 1. Check if server is clustered
 	# lspv
 	
@@ -21,23 +21,23 @@ a. If not clustered:
 		
 	# chfs -a size=+2G /opt
 		- To add additional 2G to /opt
-<br>	
+<br><br>	
 ### Disable a legary service
 	# chsubserver -r inetd -C /etc/inetd.conf -d -v 'telnet' -p 'tcp6'
 	# chsubserver -r inetd -C /etc/inetd.conf -d -v 'daytime' -p 'udp' 
 	# chsubserver -r inetd -C /etc/inetd.conf -d -v 'daytime' -p 'tcp'
-<br>	
+<br><br>	
 ### Remove IP address
 	# ifconfig en0 down detach
 	# rmdev -dl en0
-<br>
+<br><br>
 ### Check NIC devices
 	# lsdev -Cc adapter
 	# smitty tcpip
-<br>
+<br><br>
 ### Scan for new devices
 	# cfgmgr -v
-<br>	
+<br><br>	
 ### Account Setup
 	# useradd -m tmpadm
 	# chuser expires=0 tmpadm

@@ -3,9 +3,14 @@
 	# mkfs.ext3 /dev/vgdata/lvappldb2
 	# tune2fs -c -1 /dev/vgdata/lvappldb2
 
-	
-	
 ### Account Setup
 	# useradd -m tmpadm
 	# chage -M 99999 tmpadm
 	# passwd tmpadm
+	
+### Make ISO from a directory
+  *** Required package/command:
+		mkisofs command
+
+	# mkisofs -o file.iso /root/data
+    - this will create an iso called "file.iso" containing the data inside "/root/data" directory

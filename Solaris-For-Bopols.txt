@@ -1,0 +1,89 @@
+### System Information
+
+** Show Release/Version/Build
+  # uname -r   -> print system release level
+  # showrev    -> show machine and software revision information
+
+** Show Hardware 
+  # prtdiag -v  -> print system diagnostic information
+  # prtconf -> print system configuration
+  # psrinfo   -> display CPU information
+    -p   -> number of physical processors
+    -pv  -> more processor details
+  # kstat cpu_info | grep core_id | uniq | wc -l -> total number of cores of all processors
+
+*** Display SN/Serial Number 
+  # sneep -a   -> provides a software-accessible Chassis Serial Number
+  # prtdiag -v  -> contains S/N information
+
+*** Booting from OBP 
+  ok? boot  -> normal boot 
+  ok? boot -s   -> boot in single user mode 
+  ok? boot cdrom -> boot from CD 
+
+*** FC and HBA 
+  # cfgadm -al
+  # luxadm probe -> display wwn connection
+  # luxadm display <wwn> 
+  # fcinfo hba-port  -> display port connection 
+  # fcinfo hba-port -sl -p <wwn> 
+
+*** Server Reboot / Shutdown 
+  # shutdown -i6 -y -g0   (Reboot) 
+  # shutdown -i0 -y -g0 (OBP) 
+  # shutdown -i5 -y -g0 (Halt) 
+
+*** See CPU bit capability
+  # isainfo -> describe instruction set information. 64-bit is with "sparcv9"
+
+*** See CPU configuration
+  # psrinfo -p 
+  # psrinfo -pv
+
+*** Monitor CPU 
+  # prstat -s cpu  -> sort by CPU usage
+  # prstat -Z   -> display zone usage
+
+*** Monitor Memory 
+  # prstat -s size -> sort by memory usage
+  # ps -efl |sed '1d'|sort -nrk10 |awk '{printf("- PID:%s \t UID:%s \t %s MB \t%s %s\n", $1,$3,$10*8192/1048576,$16,$17) }' | head -50
+    (8192 pagesize)
+
+*** Recover WTMP 
+  # /usr/lib/acct/fwtmp 
+
+
+### User Management 
+
+*** Disable Password Expire for Specific Account 
+   # passwd -x -1 <username>
+
+*** Unlock for Specific Account
+   # passwd -u <username>
+
+*** Change default shell for Specific Account 
+   # chsh <username> 
+
+*** Solaris RSC 
+   # /usr/platform/SUNW,Sun-Fire-V490/rsc/rscadm usershow
+   # /usr/platform/SUNW,Sun-Fire-V490/rsc/rscadm useradd user1
+   # /usr/platform/SUNW,Sun-Fire-V490/rsc/rscadm userperm user1 cuar
+   # /usr/platform/SUNW,Sun-Fire-V490/rsc/rscadm userpassword user1
+
+
+### Disk Management 
+
+
+### Network Management 
+
+
+### Software Management
+
+### ISSUES
+** Unable to remove SVM submirror due to error: "operation would result in no readable submirrors"
+   example:
+   # metadetach d20 d21
+   metadetach: testserver: d20: operation would result in no readable submirrors
+  
+  solution:
+  - Temporarily remove from vfstab, boot to single user mode (boot -s), and then remove

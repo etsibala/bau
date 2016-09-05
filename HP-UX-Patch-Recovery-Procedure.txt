@@ -1,0 +1,83 @@
+[ -- HP-UX Patch Recovery Procedure -- ]
+     document status: in progress, by etsibala_@_gmail.com
+
+~~ Remove installed patches
+
+If the system is bootable and you can login to the system, use swremove to uninstall the installed patch bundle and reboot the system.
+
+If system is not bootable:
+1.) Boot from previous kernel and remove offending patch using swremove.
+
+Note: If you need to remove the installed patch bundle:
+Generate a list of patches to be removed which were installed as part of this change
+
+  # swlist -l product -a install_date | grep 2007MMDD | awk '{print $1}' > /tmp/patches_to_remove.txt
+
+NOTE: In the above line 2007MMDD corresponds to the install date of the patch bundles. 
+For example if the install date was Jan 17 2007, then 2007MMDD should read 20070117
+
+NOTE: The list of patches to be removed should be verified to confirm that only patches installed as a result of this change will be removed. 
+Check the /tmp/patches_to_remove.txt file against the list of patches installed in the /var/adm/sw/swinstall.log and /var/adm/sw/swagent.log files.
+
+2.) Remove the patches
+  # swremove -x mount_all_filesystems=false -x autoreboot=true -f /tmp/patches_to_remove.txt
+
+Progress of the patch removal can be viewed in the swagent.log (until the reboot takes place), eg:
+  # tail -f /var/adm/sw/swagent.log
+
+Once the system has rebooted, remove the bundle definitions:
+
+3.) Now generate the bundle definition list including the revision details
+  # swlist –l bundle –a install_date | grep 2007MMDD | awk '{print $1}' > /tmp/bundle_def
+
+For every bundle get the revision details
+  # swlist –a revision –l bundle "bundle name"
+
+4.) Remove the bundle definitions
+  # swremove –x mount_all_filesystems=false "Bundle name".,r="bundle revision"
+
+  e.g.
+  # swremove GOLDAPPS11i.,r=B.11.11.0509.429Note: remember the "." After the bundle name
+
+  
+~~ Recover from Ignite backup:
+
+  Note: Direct tape boot is not supported on IA systems
+
+    1.) Load the Ignite recovery archive tape media on to tape drive.
+
+    2.) Boot system using Install DVD with the same version of Ignite-UX that is running on the system.
+
+    3.) Once DVD booted, select Install HP-UX option
+
+    4.) And select Media only install & advanced installation options
+    [ * ] Media only installation
+    [ * ] Advanced Installation (recommended for disk and filesystem
+
+    5.) Next you will get an option to select media from where you want to recover system.
+    Here you choose
+    [ * ] Boot from CD/DVD, Recover from Tape
+
+Now you will get the option to choose the tape device path and select. 
+Then it will load the Ignite recovery archive from tape media and the system will be recovered.
+
+B.4.2 Option 2 (if using Ignite network recovery archive)
+
+If the system is not bootable, the system may need to be recovered using the Ignite network recovery archive.
+
+Ignite-UX Network Recovery of vPar
+
+1.) Set the autoboot flag & kernel path for the target vPar:
+  # vparmodify -p <vpar name> -B manual -b /stand/WINSTALL
+
+2.) Set the TERM variable to hpterm:
+  # export TERM=hpterm
+
+3. Boot the client vPar system to install:
+  # vparboot -p <vpar name> -I 15.xx.yy.zz,/opt/ignite/boot/WINSTALL
+
+4.) When restore is complete, reset the autoboot flag (if desired) and kernel path for the recovered vPar:
+  # vparmodify -p <vpar name> -B auto -b /stand/vmunix
+
+5.) Boot the client vPar system to verify:
+  # vparboot -p <vpar name>

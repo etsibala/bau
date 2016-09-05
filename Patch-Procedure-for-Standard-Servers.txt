@@ -1,0 +1,63 @@
+[ -- Patch Procedure for Standard Servers -- ]
+     document status: in progress, by etsibala_@_gmail.com
+
+~~ Preparation Stage:
+1) Download the patch from HP-UX website
+2) Extract the downloaded patch file or depot file in /var/tmp/patch and run the shar file.
+3) Make sure that you have a recent ignite and data backups of the server
+4) Login to host's MP with a terminal with logging
+5) Verify the server state and record important server settings into a file for your reference.
+  # ./admtool-hpux.sh logchk
+  # ./admtool-hpux.sh hpinfo email
+  Try the above script here
+
+6) Reboot the server before starting the patching
+  # shutdown -r -y 0
+
+7) Verify the server state again:
+  # ./admtool-hpux.sh logchk
+
+8) Verify all application services running on the server
+9) Insure kernel rebuild is successful:
+  # kconfig -e /stand/system.test
+  # kconfig -i hpux_test /stand/system.test
+
+10) Check the state of the system patches:
+  # swlist -l fileset -a state | grep -v -e "#" -e "configured"
+
+11) Stop Measureware agent and kill ttd daemon
+  # mwa stop
+  # /opt/perf/bin/ttd -k
+
+12) Stop CDE environment and print spooler
+  # /usr/dt/bin/dtconfig -d
+  # /usr/dt/bin/dtconfig -kill
+  # lpshut
+
+13) Run swinstall to install the patch bundle:
+  # swinstall -s /var/tmp/patch/depot
+    or
+  # swinstall -s /var/tmp/patch/patch.depot
+
+14) Choose reboot
+15) Verify installed patches:
+  # swlist -l bundle | grep -E -i 'gold|qpk'
+  # swlist -l product -a install_date | grep <20090715> | awk '{print $1}'
+  # swlist -l bundle -a install_date | grep < 20090715> | awk '{print $1}'
+  # swlist -a revision -l bundle "bundle name"
+
+16) Start Measureware agent and ttd if not running
+  # mwa status
+  # ps -ef |grep ttd
+
+17) Enable the CDE:
+  # /usr/dt/bin/dtconfig -e
+
+18) Reboot the server:
+  # shutdown -r -y 0
+
+19) Do a post verification of the server state:
+  # ./admtool-hpux.sh logchk
+  # ./admtool-hpux.sh hpinfo email
+  
+20) Verify the application services

@@ -1,0 +1,18 @@
+[ -- Creating SVM Soft Partition -- ]
+
+1. Partition the primary disk (c1t3d0) thru format command
+
+2. Copy partition details to secondary disk (c1t4d0)
+  # prtvtoc /dev/rdsk/c1t3d0s2 | fmthard -s - /dev/rdsk/c1t4d0s2
+
+3. Initialize the 2 disks as meta devices
+  # metainit -f d100 1 1 c1t3d0s2
+  # metainit -f d200 1 1 c1t4d0s2
+
+4.
+  metainit d110 -m d100
+  metainit d110 -m d200
+
+5.
+  # metainit d111 -p d110 40gb
+  # metainit d112 -p d110 100mb

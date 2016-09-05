@@ -1,4 +1,7 @@
-### System Information
+[ -- Solaris for Bopols]
+	 document status: in progress, by etsibala_@_gmail.com
+	 
+~~ System Information
 
 ** Show Release/Version/Build
   # uname -r   -> print system release level
@@ -53,7 +56,7 @@
   # /usr/lib/acct/fwtmp 
 
 
-### User Management 
+~~ User Management 
 
 *** Disable Password Expire for Specific Account 
    # passwd -x -1 <username>
@@ -71,15 +74,15 @@
    # /usr/platform/SUNW,Sun-Fire-V490/rsc/rscadm userpassword user1
 
 
-### Disk Management 
+~~ Disk Management 
 
 
-### Network Management 
+~~ Network Management 
 
 
-### Software Management
+~~ Software Management
 
-### ISSUES
+~~ ISSUES
 ** Unable to remove SVM submirror due to error: "operation would result in no readable submirrors"
    example:
    # metadetach d20 d21

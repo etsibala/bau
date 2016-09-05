@@ -1,4 +1,5 @@
-Temporary Root Access Request Procedure
+[ -- Temporary Root Access Request Procedure -- ]
+	 document status: in progress, by etsibala_@_gmail.co
 
 This is my proposed process of granting full SUDO root access to user of a Linux system in a given date or period.
 This process assumes that sudo is in configured and "unixgrp" is a valid group in the system and has "su -" privilege in sudoers file.
@@ -12,26 +13,26 @@ The step-by-step procedure below can easily be "menu-based" scripted to avoid an
 
 1. Check if "tmpadmin" exist:
 
-    # id tmpadmin
-    # finger tmpadmin
+  # id tmpadmin
+  # finger tmpadmin
 
 2. If "tmpadmin" does not exist create and set the password:
 
-    # useradd -m tmpadmin
-    # chage -M 99999 tmpadmin
+  # useradd -m tmpadmin
+  # chage -M 99999 tmpadmin
 
 3. Make sure "tmpadmin" is part of "unixgrp" group
 
-    # usermod -A unixgrp tmpadmin
+  # usermod -A unixgrp tmpadmin
 
 4. Disable direct login of “tmpadmin”
 
-    # echo “- : tmpadmin : ALL” >> /etc/security/access.conf
+  # echo “- : tmpadmin : ALL” >> /etc/security/access.conf
 
 5. Check the validity of the "tmpadmin" account
 
     Linux-based:
-    # chage -l tmpadmin | grep "Account Expires"
+  # chage -l tmpadmin | grep "Account Expires"
     Account Expires:        Aug 10, 2015
 
     AIX:
@@ -39,39 +40,39 @@ The step-by-step procedure below can easily be "menu-based" scripted to avoid an
 
 - If the account is newly created, set a new password, expiry date and tracker information:
 
-    # passwd tmpadmin
+  # passwd tmpadmin
 
     Linux-based:
-    # usermod -e "2015-08-30" -c "TICKET-000100101" tmpadmin
+  # usermod -e "2015-08-30" -c "TICKET-000100101" tmpadmin
 
     AIX:
-       # chuser expires=0830235915 tmpadmin
-    # chuser gecos="TICKET-000100101" tmpadmin
+     # chuser expires=0830235915 tmpadmin
+  # chuser gecos="TICKET-000100101" tmpadmin
 
 - If the account already expired, set a new password, expiry date and tracker information:
 
-    # passwd tmpadmin
+  # passwd tmpadmin
 
    Linux-based:
-    # usermod -e "2015-08-30" -c "TICKET-000100102" tmpadmin
+  # usermod -e "2015-08-30" -c "TICKET-000100102" tmpadmin
     AIX:
-       # chuser expires=0830235915 tmpadmin
-    # chuser gecos="TICKET-000100102" tmpadmin
+     # chuser expires=0830235915 tmpadmin
+  # chuser gecos="TICKET-000100102" tmpadmin
 
 - If the account has not yet expired, check previous tracker ticket for the current password.
 
-    # finger tmpadmin | grep "Name:"
+  # finger tmpadmin | grep "Name:"
     example:
     Login: tmpadmin                          Name: TICKET-000100103
 
 - If the account expiry date needs to be extended, set a new date and the new tracker information:
 
    Linux-based:
-    # usermod -e "2015-09-30" -c "TICKET-000100104" tmpadmin
+  # usermod -e "2015-09-30" -c "TICKET-000100104" tmpadmin
 
     AIX:
-       # chuser expires=0930235915 tmpadmin
-    # chuser gecos="TICKET-000100104" tmpadmin
+     # chuser expires=0930235915 tmpadmin
+  # chuser gecos="TICKET-000100104" tmpadmin
 
 6. Securely save the password and send the details to the requester.
     The requester should have his/her own account to login to system.

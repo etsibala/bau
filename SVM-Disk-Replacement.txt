@@ -1,69 +1,67 @@
 [ --- SVM Disk Replacement --- ]
-
+	 document status: in progress, by etsibala_@_gmail.com
+	 
 Solution1:
 
 1) Detach defective disk:
-# metadetach d0 d20; metadetach d1 d21
+  # metadetach d0 d20; metadetach d1 d21
 
 2) Replace the disk online c1t1d0
 
 3) Allow the disk to be recognized thru devfsadm command:
-# devfsadm
+  # devfsadm
 
 4) Once disk is recognized, copy the vtoc of other submirror c1t0d0s0 through fmthard and prtvtoc commands:
-# prtvtoc /dev/rdsk/c1t0d0s2 | fmthard -s - /dev/rdsk/c1t1d0s2
+  # prtvtoc /dev/rdsk/c1t0d0s2 | fmthard -s - /dev/rdsk/c1t1d0s2
 
 5) Recreate metadevices on slice 7:
-# metadb -d /dev/dsk/c1t1d0s7; metadb –a –f –c 3 /dev/dsk/c1t1d0s7
+  # metadb -d /dev/dsk/c1t1d0s7; metadb –a –f –c 3 /dev/dsk/c1t1d0s7
 
 6) Clear metadevices d20, d21:
-# metaclear d20; metaclear d21
+  # metaclear d20; metaclear d21
 
 7) Recreate the metadevices:
-# metainit d20 1 1 c1t1d0s0; metainit d21 1 1 c1t1d0s1
+  # metainit d20 1 1 c1t1d0s0; metainit d21 1 1 c1t1d0s1
 
 8) Reattach the submirrors:
-# metattach d0 d20; metattach d1 d21
+  # metattach d0 d20; metattach d1 d21
 
 
 Solution2:
 
 1) See disk configuration:
-# cfgadm -al
+  # cfgadm -al
 
 2) See replicas of the metadevice state database:
-
-# metadb –i
+  # metadb –i
 
 3) Remove the faulty disk in metadevice state database:
-# metadb -d c1t1d0s7
+  # metadb -d c1t1d0s7
 
 4) Unset the faulty disk in the disk configuration:
-# cfgadm -c unconfigure c1::21000004cf96b4d3
+  # cfgadm -c unconfigure c1::21000004cf96b4d3
 
 5) Replace the disk online c1t1d0
 
 6) Double check the disk status
-
-# echo | format
+  # echo | format
 
 7) Once disk is recognized, copy the vtoc of other submirror c1t0d0s0 thru fmthard and prtvtoc commands:
-# prtvtoc /dev/rdsk/c1t0d0s2 | fmthard -s - /dev/rdsk/c1t1d0s2
+  # prtvtoc /dev/rdsk/c1t0d0s2 | fmthard -s - /dev/rdsk/c1t1d0s2
 
 8) Recreate the metadevice state database:
-
-# metadb -afc3 c1t1d0s7
+  # metadb -afc3 c1t1d0s7
 
 9) Check new replicas of the metadevice state database:
-# metadb –i
+  # metadb –i
 
 10) Check the status of disk errors:
-# iostat -En c1t0d0
-# iostat -En c1t1d0
+  # iostat -En c1t0d0
+  # iostat -En c1t1d0
 
 11) Check the status of metadevice:
-# metastat
+  # metastat
 
 12) Replace the metadevice with “Need maintenance”:
-# metareplace -e d0 c1t1d0s0
-# metareplace -e d1 c1t1d0s1
+  # metareplace -e d0 c1t1d0s0
+  # metareplace -e d1 c1t1d0s1

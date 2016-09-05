@@ -1,22 +1,24 @@
-Scan/Rescan for SCSI disk
+[ -- Scan/Rescan for SCSI disk -- ]
+     document status: in progress, by etsibala_@_gmail.com
 
 1. Know which scsi host to scan or rescan
-    # hwinfo --disk
-        - use this command (may not be installed) to see which scsi host you need to scan/rescan
-    # find /sys -type d -name "sd?"; ls -l /sys/class/scsi_host
-        - alternatively, you can use the above command to identify the scsi host to rescan
-    # find /sys -type d -name "sd?"; ls -l /sys/class/scsi_disk
-        - alternatively, you can use the above command to identify the scsi disk to rescan
-    # rescan-scsi-bus.sh --forcerescan
-        - alternative command for SuSE distro to rescan scsi disk
+  # hwinfo --disk
+      - use this command (may not be installed) to see which scsi host you need to scan/rescan
+  # find /sys -type d -name "sd?"; ls -l /sys/class/scsi_host
+      - alternatively, you can use the above command to identify the scsi host to rescan
+  # find /sys -type d -name "sd?"; ls -l /sys/class/scsi_disk
+      - alternatively, you can use the above command to identify the scsi disk to rescan
+  # rescan-scsi-bus.sh --forcerescan
+      - alternative command for SuSE distro to rescan scsi disk
 
 2. Execute the scan or rescan to the scsi host (find new disk)
-    # echo "- - -" > /sys/class/scsi_host/<your_scsi_host>/scan
-        - this will do the rescan of the specific scsi host
+  # echo "- - -" > /sys/class/scsi_host/<your_scsi_host>/scan
+      - this will do the rescan of the specific scsi host
+
 3. Execute the rescan to the scsi_disk (find new disk size)
-    # echo "1" > /sys/class/scsi_disk/<your_scsi_disk>/device/rescan
-        - this will do the rescan of the specific scsi host
+  # echo "1" > /sys/class/scsi_disk/<your_scsi_disk>/device/rescan
+      - this will do the rescan of the specific scsi host
 
 4. Verify the new disk details
-    # fdisk -l
-        - to see the new size of the disk
+  # fdisk -l
+      - to see the new size of the disk

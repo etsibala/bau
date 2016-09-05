@@ -1,4 +1,5 @@
 [ -- Creating SVM Soft Partition -- ]
+     document status: in progress, by etsibala_@_gmail.com
 
 1. Partition the primary disk (c1t3d0) thru format command
 

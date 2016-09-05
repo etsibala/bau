@@ -1,67 +1,68 @@
 [ --- Sun Cluster Management --- ]
-
+	 document status: in progress, by etsibala_@_gmail.com
+	 
 View VCS Package and Resources
-# hastatus –summ
+  # hastatus –summ
 
 Online a Package
-# hagrp -online <Pkg_group> -sys <host>
+  # hagrp -online <Pkg_group> -sys <host>
 
 Offline a Package
-# hagrp -offline <Pkg_group> -sys <host>
+  # hagrp -offline <Pkg_group> -sys <host>
 
 Disable VCS Failover
-# hagrp -freeze <Pkg_group>
+  # hagrp -freeze <Pkg_group>
 
 Enable VCS Failover
-# hagrp -unfreeze <Pkg_group>
+  # hagrp -unfreeze <Pkg_group>
 
 Failover a Package
-# hagrp -switch <Pkg_group> -to <host>
+  # hagrp -switch <Pkg_group> -to <host>
 
 Clear Failed Resources
-# hares -clear <xxx_resources> -sys <host>
+  # hares -clear <xxx_resources> -sys <host>
 
 Stopping entire cluster
-# scshutdown -g0 -y -> will bring the systems/nodes in ok prompt
+  # scshutdown -g0 -y -> will bring the systems/nodes in ok prompt
 Oracle Parallel/Real Application Cluster must be manually
 stopped prior to the command
 
 Stopping a cluster node
-# scswitch -S -h nodelist -> switch all resource group, resources, and device groups
-from the node being stopped to other cluster members
+  # scswitch -S -h nodelist -> switch all resource group, resources, and device groups
+  from the node being stopped to other cluster members
 
 
 Boot a cluster node
 ok? boot -> normal boot from OBP prompt
 ...
 
-# scstat -n -> check status of the node
+  # scstat -n -> check status of the node
 
 Boot a node in non-cluster mode
 ok? boot -x -> boot with "-x" from OBP prompt
 
 
 Enable monitoring of a resource
-# scswitch -n -M -j <resource_name> -> auto switching
+  # scswitch -n -M -j <resource_name> -> auto switching
 Add a Quorum disk
-# clquorum list
+  # clquorum list
 d11
 server1
 server2
-# scconf -a -q globaldev=d12
-# clquorum list
+  # scconf -a -q globaldev=d12
+  # clquorum list
 d11
 d12
 server1
 server2
 Remove a Quorum disk
-# clquorum list
+ # clquorum list
 d11
 d12
 server1
 server2
-# scconf -r -q name=d12
-# clquorum list
-d11
+  # scconf -r -q name=d12
+  # clquorum list
+  d11
 server1
 server2

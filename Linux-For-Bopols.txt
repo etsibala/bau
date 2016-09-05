@@ -1,5 +1,5 @@
 [ -- Linux for Bopols --- ]
-      by etsibala
+     document status: in progress, by etsibala_@_gmail.com
 
 ~~ Create LVM logical volume
   # lvcreate -L 10G -n appstorelv vgdata

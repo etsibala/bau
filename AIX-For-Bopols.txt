@@ -33,6 +33,9 @@ a. If not clustered:
 ~~ Scan for new devices
   # cfgmgr -v
 	
+~~ Check disk devils
+  #  lscfg -vpl hdisk1041
+  
 ~~ Account Setup
   # useradd -m tmpadm
   # chuser expires=0 tmpadm

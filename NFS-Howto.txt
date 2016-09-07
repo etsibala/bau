@@ -23,15 +23,19 @@
 ~~ Setting up NFS client on RHEL7
 1. Install required packages
    # yum -y nfs-utils
-2. Verify that the share is accessible
+2. Enable and start below service to support mounting during bootup
+   # systemctl start remote-fs.target
+   # systemctl enable remote-fs.target   
+3. Verify that the share is accessible
    # showmount -e <nfs_server>
-3. Add the share /etc/fstab
+4. Add the share /etc/fstab
    # vi /etc/fstab
    eg.
     <nfs_server>:/share /nfsshare	nfs	rw,bg,hard,nointr,tcp,vers=3,timeo=300,rsize=32768,wsize=32768
-4. Mount the shared folder
+5. Mount the shared folder
    # mkdir /nfsshare
    # mount /nfsshare
-5. Verify the access permission
+6. Verify the access permission
    # touch /nfsshare/testfile
+   # ls -l /nfsshare/testfile
    

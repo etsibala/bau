@@ -4,16 +4,16 @@
 
 +++ START LINUX SECTION ------------------------------------------------------------------- +++
 
-~~ Create LVM logical volume
+~~ [lnx] Create LVM logical volume
   # lvcreate -L 10G -n appstorelv vgdata
   # mkfs.ext3 /dev/vgdata/appstorelv
   # tune2fs -c -1 /dev/vgdata/appstorelv
 
-~~  Renaming a logical volume (LV)
+~~ [lnx] Renaming a logical volume (LV)
   # umount <FS>
   # lvrename /dev/vg02/lvold /dev/vg02/lvnew
 
-~~ Reducing an existing LVM filesystem
+~~ [lnx] Reducing an existing LVM filesystem
 1. Here is a sample filesystem
   # df -h /software
   /dev/mapper/rootvg-soft_lv

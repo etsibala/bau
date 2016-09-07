@@ -1,6 +1,9 @@
 [ -- AIX for Bopols -- ]
      document status: in progress, by etsibala_@_gmail.com
 
+~~ Changing timezone
+  # smitty chtz_date
+
 ~~ Creating a logical volumes
 1. Create the logiacal volume /nsr
   # crfs -v jfs2 -g rootvg  -m /nsr -a size=2G -A yes 

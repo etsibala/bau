@@ -34,7 +34,11 @@
 ~~ Enable CPU/Mem manually
   # echo 1 > /sys/devices/system/cpu/cpuX/online
   # find /sys/devices/system/memory/ -name state -exec grep -l offline {} \; | while read x; do echo online > $x; done
-  
+
+~~ Find WWID
+  # scsi_id -gud /dev/sda
+  # ls -l /dev/disk/by-id/* | grep sda
+
 ~~ Build a RPM package
   Required package: rpmdevtools
   # rpmdev-setuptree (this will create a directory structure under "rpmbuild" directory)

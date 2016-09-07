@@ -1,3 +1,6 @@
+[ -- How to create dump from VMWare --- ]
+     document status: complete, by etsibala_@_gmail.com
+     
 1. Login to vSphere client and navigate to guest OS which is hung. Take the snapshot of that guest OS prior to reset
 
 2.Click on the summary of the guest operating system and see which datastore has been used

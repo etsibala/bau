@@ -5,54 +5,43 @@
   # lvcreate -L 10G -n appstorelv vgdata
   # mkfs.ext3 /dev/vgdata/appstorelv
   # tune2fs -c -1 /dev/vgdata/appstorelv
-
   
 ~~ Make ISO from a directory
   # mkisofs -o file.iso /root/data
   
   Note: This will create an iso file called "file.iso" containing the data inside "/root/data" directory
         Required package/command: mkisofs command
-
 		
 ~~ Displaying local filesystem only in posix format
   # df --local -P
 
-  
 ~~ Sample bypassing read-only ENV variables
   # exec env -u TMOUT bash
   
   Note: Clears TMOUT value and then open another bash shell
 
-  
 ~~ Create a test file with file size
   # dd if=/dev/zero of=test.txt bs=32768 count=10000
 
-  
 ~~ Create a test file with file size
   # postfix check
 
-  
 ~~ Check for CPU IO wait process (uninterrupted process)
   # ps -eo state,pid,cmd | grep "^D"
   # iostat
   # lsof -o <PID>
 
+~~ Enable CPU/Mem manually
+  # echo 1 > /sys/devices/system/cpu/cpuX/online
+  # find /sys/devices/system/memory/ -name state -exec grep -l offline {} \; | while read x; do echo online > $x; done
   
 ~~ Build a RPM package
   Required package: rpmdevtools
-  
-  # rpmdev-setuptree
-      - this will create a directory structure under "rpmbuild" directory
-  
-  # cp <package_name>.tar.gz rpmbuild/SOURCES
-      - put the package file to create under "rpmbuild/SOURCES" directory
-  
+  # rpmdev-setuptree (this will create a directory structure under "rpmbuild" directory)
+  # cp <package_name>.tar.gz rpmbuild/SOURCES (put the package file to create under "rpmbuild/SOURCES" directory)
   # cd SPECS
   # rpmdev-newspec <package_name>
-  # vi <package_name>.spec
-      - create the specs file and modify the content
-  
-  # rpmbuild -ba <package_name>.spec
-    - build the specs file
+  # vi <package_name>.spec (create the specs file and modify the content)
+  # rpmbuild -ba <package_name>.spec (build the specs file)
 	
 	

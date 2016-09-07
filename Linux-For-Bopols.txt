@@ -8,7 +8,6 @@
   
 ~~ Make ISO from a directory
   # mkisofs -o file.iso /root/data
-  
   Note: This will create an iso file called "file.iso" containing the data inside "/root/data" directory
         Required package/command: mkisofs command
 		
@@ -17,7 +16,6 @@
 
 ~~ Sample bypassing read-only ENV variables
   # exec env -u TMOUT bash
-  
   Note: Clears TMOUT value and then open another bash shell
 
 ~~ Create a test file with file size
@@ -39,6 +37,26 @@
   # scsi_id -gud /dev/sda
   # ls -l /dev/disk/by-id/* | grep sda
 
+~~ How to Trigger Manual Dump
+  # echo 1 > /proc/sys/kernel/sysrq
+  # echo c > /proc/sysrq -trigger 
+
+~~ Disk Write Test
+  $ dd if=/dev/zero of=testfile bs=16k count=16384
+  $ dd if=/dev/zero of=testfile bs=16k count=16384 conv=fsync
+
+~~ Crontab Example
+  # crontab -e
+  */5 * * * * /usr/local/bin/cpu_mem-alert.sh > /dev/null 2>&1
+  0 8 * * * /usr/automation/solaris-logcheck.sh send_mail > /dev/null 2>&1
+
+~~ Uptime readable date
+  $ date -d @$(( $(date +%s) - $(cut -f1 -d. /proc/uptime) ))
+
+~~ Manage SWAP
+  # swapon -s (show swap information)
+  # free -m
+  
 ~~ Build a RPM package
   Required package: rpmdevtools
   # rpmdev-setuptree (this will create a directory structure under "rpmbuild" directory)

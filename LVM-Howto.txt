@@ -9,9 +9,11 @@
   # mkfs.ext3 /dev/vgdata/appstorelv
   # tune2fs -c -1 /dev/vgdata/appstorelv
 
+
 ~~ [lnx] Renaming a logical volume (LV)
   # umount <FS>
   # lvrename /dev/vg02/lvold /dev/vg02/lvnew
+
 
 ~~ [lnx] Reducing an existing LVM filesystem
 1. Here is a sample filesystem

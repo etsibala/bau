@@ -5,7 +5,11 @@
   # lvcreate -L 10G -n appstorelv vgdata
   # mkfs.ext3 /dev/vgdata/appstorelv
   # tune2fs -c -1 /dev/vgdata/appstorelv
-  
+
+~~  Renaming a logical volume (LV)
+  # umount <FS>
+  # lvrename /dev/vg02/lvold /dev/vg02/lvnew
+
 ~~ Make ISO from a directory
   # mkisofs -o file.iso /root/data
   Note: This will create an iso file called "file.iso" containing the data inside "/root/data" directory

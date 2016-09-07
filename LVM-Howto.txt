@@ -2,7 +2,7 @@
 [ -- LVM Howto --- ]
      document status: in progress, by etsibala_@_gmail.com
 
-+++ START LINUX SECTION +++
++++ START LINUX SECTION ------------------------------------------------------------------- +++
 
 ~~ Create LVM logical volume
   # lvcreate -L 10G -n appstorelv vgdata
@@ -44,4 +44,4 @@
     Reducing logical volume soft_lv to 98.00 GB
     Logical volume soft_lv successfully resized
     
-+++ END OF LINUX SECTION +++
++++ END LINUX SECTION ------------------------------------------------------------------- +++

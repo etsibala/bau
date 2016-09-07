@@ -11,6 +11,13 @@
 ~~ Show user account settins
   # chage -l <username>
   
+
++++ Disk Management
+
+~~ Rescan disk partition (/dev)
+  # partprobe -s /dev/mpath/mpath13
+  # kpartx -av /dev/mpath/mpath13
+
 ~~ Make ISO from a directory
   # mkisofs -o file.iso /root/data
   Note: This will create an iso file called "file.iso" containing the data inside "/root/data" directory

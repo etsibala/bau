@@ -1,5 +1,5 @@
--- NFS Server
 
+-- NFS Server
 ~~ Setting up NFS server on RHEL7
 1. Install required packages
    # yum -y nfs-utils
@@ -17,6 +17,7 @@
    # iptables -L
 6. Verify that the share is visible
    # showmount -e
+
 
 -- NFS Client
 ~~ Setting up NFS client on RHEL7

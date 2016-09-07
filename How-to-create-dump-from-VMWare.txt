@@ -1,0 +1,17 @@
+1. Login to vSphere client and navigate to guest OS which is hung. Take the snapshot of that guest OS prior to reset
+
+2.Click on the summary of the guest operating system and see which datastore has been used
+
+3. Just right click on the datastore and select browse. You will get a below pop-up window
+
+4.Select the most recent *.vmsn file .(Vmware snapshot file) and download to your laptop. (Ex: D:\)
+
+5.Download the “vmsscore” file from vmware labs (https://labs.vmware.com/flings/vmss2core) for windows operating system (Ex: D:\).
+
+6.Once you have “vmsscore.exe” and guest os snapshot (*.vmsn) file in same place, 
+ you can start convert the snapshot using below mentioned method.open a command prompt,
+ D:\>vmss2core_win.exe -M SOL10-Snapshot2.vmsn
+
+7. Send the core outout for RCA 
+
+Reference: http://www.unixarena.com/2014/04/generate-crashdump-vmware-guests-using-snapshot.html

@@ -11,46 +11,6 @@
 ~~ Show user account settins
   # chage -l <username>
   
-~~ Create LVM logical volume
-  # lvcreate -L 10G -n appstorelv vgdata
-  # mkfs.ext3 /dev/vgdata/appstorelv
-  # tune2fs -c -1 /dev/vgdata/appstorelv
-
-~~  Renaming a logical volume (LV)
-  # umount <FS>
-  # lvrename /dev/vg02/lvold /dev/vg02/lvnew
-
-~~ Reducing an existing LVM filesystem
-1. Here is a sample filesystem
-  # df -h /software
-  /dev/mapper/rootvg-soft_lv
-                         99G   36G   58G  39% /software
-2. The filesystem needs to be unmounted
-  #  umount /software
-
-3. The filesystem then needs to be checked
-  # e2fsck -f /dev/mapper/rootvg-soft_lv
-  e2fsck 1.39 (29-May-2006)
-  Pass 1: Checking inodes, blocks, and sizes
-  Pass 2: Checking directory structure
-  Pass 3: Checking directory connectivity
-  Pass 4: Checking reference counts
-  Pass 5: Checking group summary information
-  /dev/mapper/rootvg-soft_lv: 15616/13107200 files (0.7% non-contiguous), 9819782/26214400 blocks
-
-4. The following example removes 1GB to the existing filesystem
-  # resize2fs /dev/mapper/rootvg-soft_lv 98G
-  resize2fs 1.39 (29-May-2006)
-  Resizing the filesystem on /dev/mapper/rootvg-soft_lv to 25690112 (4k) blocks.
-  The filesystem on /dev/mapper/rootvg-soft_lv is now 25690112 blocks long.
-
-  # lvreduce -L 98G /dev/mapper/rootvg-soft_lv
-    WARNING: Reducing active logical volume to 98.00 GB
-    THIS MAY DESTROY YOUR DATA (filesystem etc.)
-  Do you really want to reduce soft_lv? [y/n]: y
-    Reducing logical volume soft_lv to 98.00 GB
-    Logical volume soft_lv successfully resized
-    
 ~~ Make ISO from a directory
   # mkisofs -o file.iso /root/data
   Note: This will create an iso file called "file.iso" containing the data inside "/root/data" directory

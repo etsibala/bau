@@ -1,6 +1,16 @@
 [ -- Linux for Bopols --- ]
      document status: in progress, by etsibala_@_gmail.com
 
++++ System Information
+
+~~ Display Serial Number / Device details
+  # dmidecode
+
++++ User Management 
+
+~~ Show user account settins
+  # chage -l <username>
+  
 ~~ Create LVM logical volume
   # lvcreate -L 10G -n appstorelv vgdata
   # mkfs.ext3 /dev/vgdata/appstorelv
@@ -60,7 +70,12 @@
 ~~ Manage SWAP
   # swapon -s (show swap information)
   # free -m
-  
+
+~~ NTP information
+  # ntpq -p or ntpq -c peers 
+  # ntpstat; echo $?
+  # ntpdate -q <ntpserver>
+
 ~~ Build a RPM package
   Required package: rpmdevtools
   # rpmdev-setuptree (this will create a directory structure under "rpmbuild" directory)

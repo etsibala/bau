@@ -31,6 +31,9 @@ a. If not clustered:
 ~~ Check NIC devices
   # lsdev -Cc adapter
   # smitty tcpip
+  # entstat -d ent18 
+  # lsattr -El ent18
+  # lscfg -vpl ent0
 
 ~~ Scan for new devices
   # cfgmgr -v
@@ -41,4 +44,26 @@ a. If not clustered:
   # pwdadm -c tmpadm
   # passwd tmpadm
 
+~~ Managing services
+  # stopsrc -s sshd
+  # startsrc -s sshd
 
+~~ Show dump details
+  # sysdumpdev -e
+  # sysdumpdev -L
+
+~~ Generating snap report
+  # snap -r (clears any previous snap output in /tmp/ibmsupt)
+  # snap -ac (this is for system crashes/hangs, default /tmp location will be used)
+  # snap -a -d /directory_name/ibmsupt -c  
+
+~~ Shutdown task
+   # shutdown -Fr now (Reboot)
+   # shutdown -F (Poweroff)
+
+~~ Monitor SWAP
+   # svmon
+   
+~~ Check boot device
+   # bootlist -m normal -o
+   

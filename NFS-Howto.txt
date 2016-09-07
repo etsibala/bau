@@ -1,5 +1,8 @@
 
--- NFS Server
+[ -- NFS Howto --- ]
+     document status: in progress, by etsibala_@_gmail.com
+     
++++ NFS Server
 ~~ Setting up NFS server on RHEL7
 1. Install required packages
    # yum -y nfs-utils
@@ -19,7 +22,7 @@
    # showmount -e
 
 
--- NFS Client
++++ NFS Client
 ~~ Setting up NFS client on RHEL7
 1. Install required packages
    # yum -y nfs-utils

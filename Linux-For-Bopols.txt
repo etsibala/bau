@@ -6,6 +6,30 @@
 ~~ Display Serial Number / Device details
   # dmidecode
 
+~~ Changing timezone
+  # ln -fs /usr/share/zoneinfo/US/Pacific /etc/localtime
+
+~~ Changing date
+  # date 03121715201 (March 12, 2016 17:15)
+
+~~ NTP information
+  # ntpq -p or ntpq -c peers 
+  # ntpstat; echo $?
+  # ntpdate -q <ntpserver>
+
+~~ Crontab Example
+  # crontab -e
+  */5 * * * * /usr/local/bin/cpu_mem-alert.sh > /dev/null 2>&1
+  0 8 * * * /usr/automation/solaris-logcheck.sh send_mail > /dev/null 2>&1
+
+~~ Uptime readable date
+  $ date -d @$(( $(date +%s) - $(cut -f1 -d. /proc/uptime) ))
+
+~~ Sample bypassing read-only ENV variables
+  # exec env -u TMOUT bash
+  Note: Clears TMOUT value and then open another bash shell
+  
+  
 +++ User Management 
 
 ~~ Show user account settins
@@ -25,10 +49,6 @@
 		
 ~~ Displaying local filesystem only in posix format
   # df --local -P
-
-~~ Sample bypassing read-only ENV variables
-  # exec env -u TMOUT bash
-  Note: Clears TMOUT value and then open another bash shell
 
 ~~ Create a test file with file size
   # dd if=/dev/zero of=test.txt bs=32768 count=10000
@@ -57,22 +77,12 @@
   $ dd if=/dev/zero of=testfile bs=16k count=16384
   $ dd if=/dev/zero of=testfile bs=16k count=16384 conv=fsync
 
-~~ Crontab Example
-  # crontab -e
-  */5 * * * * /usr/local/bin/cpu_mem-alert.sh > /dev/null 2>&1
-  0 8 * * * /usr/automation/solaris-logcheck.sh send_mail > /dev/null 2>&1
-
-~~ Uptime readable date
-  $ date -d @$(( $(date +%s) - $(cut -f1 -d. /proc/uptime) ))
-
 ~~ Manage SWAP
   # swapon -s (show swap information)
   # free -m
 
-~~ NTP information
-  # ntpq -p or ntpq -c peers 
-  # ntpstat; echo $?
-  # ntpdate -q <ntpserver>
+
++++ Software Management
 
 ~~ Build a RPM package
   Required package: rpmdevtools

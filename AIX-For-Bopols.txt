@@ -10,14 +10,9 @@
   # lspv
 	
 a. If not clustered:
-  #  lsvg rootvg
-		- To check available free space
-	
-  # ls -l rootvg	
-		- To show list of logical volumes
-		
-  # chfs -a size=+2G /opt
-		- To add additional 2G to /opt
+  # lsvg rootvg (To check available free space)
+  # ls -l rootvg (To show list of logical volumes)
+  # chfs -a size=+2G /opt (To add additional 2G to /opt)
 	
 ~~ Disable a legary service
   # chsubserver -r inetd -C /etc/inetd.conf -d -v 'telnet' -p 'tcp6'
@@ -67,3 +62,9 @@ a. If not clustered:
 ~~ Check boot device
    # bootlist -m normal -o
    
+~~ Find HMC details
+   # lsrsrc IBM.MCP 
+   # prtconf |grep -i serial
+
+~~ Show VIO information
+   # echo "cvai"|kdb|grep vscsi

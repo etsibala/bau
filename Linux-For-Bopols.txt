@@ -35,7 +35,13 @@
 ~~ Show user account settins
   # chage -l <username>
   
-
+~~ Check lock/failure logins
+   # pam_tally2 --user=<username>
+   
+~~ Unlock logins due to failure
+   # pam_tally2 --user=<username> --reset
+   
+   
 +++ Disk Management
 
 ~~ Rescan disk partition (/dev)

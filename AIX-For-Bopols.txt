@@ -74,3 +74,41 @@ a. If not clustered:
 
 ~~ Show VIO information
    # echo "cvai"|kdb|grep vscsi
+
+~~ Creating a logical volumes
+1. Create the logiacal volume /nsr
+	# crfs -v jfs2 -g rootvg  -m /nsr -a size=2G -A yes 
+	
+~~ Extend VG filesystem
+1. Check if server is clustered
+	# lspv
+	
+a. If not clustered:
+	#  lsvg rootvg
+		- To check available free space
+	
+	# ls -l rootvg	
+		- To show list of logical volumes
+		
+	# chfs -a size=+2G /opt
+		- To add additional 2G to /opt
+	
+~~ Disable a legary service
+	# chsubserver -r inetd -C /etc/inetd.conf -d -v 'telnet' -p 'tcp6'
+	# chsubserver -r inetd -C /etc/inetd.conf -d -v 'daytime' -p 'udp' 
+	# chsubserver -r inetd -C /etc/inetd.conf -d -v 'daytime' -p 'tcp'
+	
+~~ Remove IP address
+	# ifconfig en0 down detach
+	# rmdev -dl en0
+
+~~ Check NIC devices
+	# lsdev -Cc adapter
+	# smitty tcpip
+
+	
+~~ Account Setup
+	# useradd -m tmpadm
+	# chuser expires=0 tmpadm
+	# pwdadm -c tmpadm
+	# passwd tmpadm

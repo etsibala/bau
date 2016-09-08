@@ -3,9 +3,23 @@
 
 +++ System Information
 
+
+~~ Manage kernel parameters
+  # sysctl -a	(show current settings)
+  # sysctl -p	(re-road /etc/sysctl.conf)
+  # sysctl -w <kern_param>=<value> 	(set a kernel parameter)
+  
 ~~ Display Serial Number / Device details
   # dmidecode
 
+~~ Display CPU/MEM
+  # cat /proc/cpuinfo /proc/meminfo
+  # free -m
+  
+~~ Manage kernel modules
+  # lsmod	(show loaded driver module)
+  # rmmod	(unload driver module)
+  
 ~~ Changing timezone
   # ln -fs /usr/share/zoneinfo/US/Pacific /etc/localtime
 
@@ -41,6 +55,12 @@
 ~~ Unlock logins due to failure
    # pam_tally2 --user=<username> --reset
    
+~~ Manage user account
+  # getent passwd
+  # useradd <account>
+  # userdel <account>
+  # usermound <account>
+   
    
 +++ Disk Management
 
@@ -48,6 +68,11 @@
   # partprobe -s /dev/mpath/mpath13
   # kpartx -av /dev/mpath/mpath13
 
+~~ Display disk drives
+  # lsscsi
+  # fdisk -l
+  # lsblk
+  
 ~~ Make ISO from a directory
   # mkisofs -o file.iso /root/data
   Note: This will create an iso file called "file.iso" containing the data inside "/root/data" directory
@@ -94,9 +119,21 @@
   COMMAND  PID USER   FD   TYPE DEVICE SIZE/OFF NODE NAME
   java    3394 root   27u  IPv4  19595      0t0  TCP *:commplex-main (LISTEN)
 
+~~ Manage NIC device
+  # ethtool eth0 OR mii-tool eth0	(displaying NIC speeds)
+  # ethtool -s eth0 speed 100 duplex full OR mii-tool -F 10baseT-HD	(setting NIC speeds)
+  # ip route	(display route)
+  # ip address	(display address)
+
 
 +++ Software Management
 
+~~ Manage packages
+  # rpm -ivh <rpm_file>	(adding package/patch)
+  # rpm -e <rpm_file>	(removing package/patch)
+  # rpm -qa 	(list installed packages)
+  # rpm -qa -last	(show installed date)
+  
 ~~ Build a RPM package
   Required package: rpmdevtools
   # rpmdev-setuptree (this will create a directory structure under "rpmbuild" directory)

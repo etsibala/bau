@@ -82,6 +82,13 @@
   # free -m
 
 
++++ Network Management 
+~~ Check for port user
+  # lsof -i :5000 (check for port 5000)
+  COMMAND  PID USER   FD   TYPE DEVICE SIZE/OFF NODE NAME
+  java    3394 root   27u  IPv4  19595      0t0  TCP *:commplex-main (LISTEN)
+
+
 +++ Software Management
 
 ~~ Build a RPM package

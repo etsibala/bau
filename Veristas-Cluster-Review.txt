@@ -1,0 +1,87 @@
+[ -- Veristas Cluster Review -- ]
+	 document status: in progress, by etsibala_@_gmail.com
+	 
+[NOTE: This is still in draft stage]
+ 
+~~ Requirements
+  1. Shared iscsi disk (OpenFiler)
+  2. Two VMs of Solaris 10 with 4 NICs
+  - node1: s10host01
+  - node2: s10host02
+ 
+~~ Procedure
+Setting up the initial environment
+  1. Setup the OpenFiler
+  2. Install Solaris 10
+  3. Configure the interfaces
+ 
+Configuring the shared iSCSI disk
+  # isvcadm enable initiator
+  # iscsiadm modify discovery --sendtargets enable
+  # iscsiadm list discovery
+  # iscsiadm add discovery-address 192.168.7.10
+  # iscsiadm list discovery-address
+  # iscsiadm list target
+  # devfsadm -Cv -i iscsi
+
+Installing Veritas Cluster Package
+  1. Download the Veritas cluster package
+  2. Extract the package and run "./installsfha" under "storage_foundation_high_availability" folder
+  3. Modify and re-export the PATH variable:
+    # PATH=$PATH:/opt/VRTS/bin/; export PATH
+
+Verifying the Cluster
+  # hastatus -sum
+  # hamsg engine_A
+  # lltstatus -nvv
+
+Configuring the disk group
+  # vxdctl enable (scan for vx disks)
+  # vxdisk list (list vx disks)
+  # vxdisksetup -i disk_5 (initialize a vx disk [disk_5])
+  # vxdg init datadg iscsi5=disk_5 (create a disk group and attached a vx disk [disk_5])
+  # vxassist -g datadg make datavol 500m (create volume)
+  # vxassist -g datadg maxsize  (check for free disk group size)
+
+Importing a disk group to another node
+  # vxdg deport datadg (on first node)
+  # vxdg import datadg (on second node)
+
+Setting up the disk resource for the cluster
+  # haconf -makerw
+  # hagrp -add diskgroup
+  # hagrp -modify diskgroup SystemList s10host01 0 s10host02 1
+  # hagrp -modify diskgroup AutoStartList s10host01
+  # hares -add dgresource DiskGroup diskgroup
+  # hares -modify dgresource DiskGroup datadg
+  # hares -add mountresource Mount diskgroup
+  # hares -modify mountresource BlockDevice /dev/vx/dsk/datadg/datavol1
+  # hares -modify mountresource MountPoint /datavol1
+  # hares -modify mountresource FsckOpt %-y
+  # hares -modify mountresource FSType vxfs
+  # hares -link mountresource dgresource
+  # hagrp -enableresources diskgroup
+  # haconf -dump -makero
+  # hagrp -online diskgroup -sys s10host01
+ 
+Setting up a IP and NIC resource for the cluster
+  # hagrp -add Apache2
+  # hagrp -modify Apache2 SystemList s10host01 0 s10host02 1
+  # hagrp -modify Apache2 AutoStartList s10host01
+  # hagrp -modify Apache2 AutoStart 1
+  # hares -add Apache2-IP IP Apache2
+  # hares -modify Apache2-IP Device e1000g0
+  # hares -modify Apache2-IP Address 192.168.0.83
+  # hares -modify Apache2-IP NetMask 255.255.255.0
+  # hares -modify Apache2-IP Critical 1
+  # hares -modify Apache2-IP Enabled 1
+  # hares -add Apache2-NIC NIC Apache2
+  # hares -modify Apache2-NIC Device e1000g0
+  # hares -modify Apache2-NIC Enabled 1
+  # hares -link Apache2-IP Apache2-NIC
+  # hagrp -enableresource Apache2
+  # hagrp -online Apache2 -sys s10host01
+ 
+Verifying the Cluster Resource
+  # hastatus -sum
+  # hares -display

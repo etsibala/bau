@@ -1,0 +1,91 @@
+[ -- Recreate A Volume Group Using BCV Copy -- ]
+	 document status: in progress, by etsibala_@_gmail.com
+	 
+~~ Assumption
+
+Hostname: hawk
+Volume Group: vgqas
+
+Logical Volumes:
+    lvol1 (262140 mb)
+    lvol2 (34096 mb)
+Physical Volumes:
+    /dev/dsk/c6t1d6
+    /dev/dsk/c10t1d6 (alternate)
+    /dev/dsk/c6t2d1
+    /dev/dsk/c10t2d1 (alternate)
+    /dev/dsk/c6t2d4
+    /dev/dsk/c10t2d4 (alternate)
+BCV Physical Volumes:
+    /dev/dsk/c6t5d5
+    /dev/dsk/c6t1d7
+    /dev/dsk/c6t3d2
+SAN Disk Group: hawkdbdg
+
+~~ Procedure
+
+1) Make sure that you have a recent ignite and data backups of the server
+2) Login to MP with logging
+3) Do a recent BCV copy of the server disks (in SAN server)
+  # symmir -g hawkdbdg que 
+  # symmir -g hawkdbdg est -nop 
+  # symmir -g hawkdbdg que
+4) Backup lvmtab
+  # cp -p /etc/lvmtab /etc/lvmtab.old
+5) Unmount all related logical volumes
+  # umount /dev/vgqas/lvol1 
+  # umount /dev/vgqas/lvol2
+6) Do a BCV split of the server disks (in SAN server)
+  # symmir -g hawkdbdg que 
+  # symmir -g hawkdbdg split -nop 
+  # symmir -g hawkdbdg que
+7) Deactivate the volume group
+  # vgchange -a n vgqas
+8) BCV disks are already accessible in HAWK
+9) Create a map file of the current VGQAS volume group
+  # vgexport -p -m vgqas.map vgqas
+10) Create a temporary BCV volume group
+  # mkdir /dev/bcv_vgqas 
+  # mknod /dev/bcv_vgqas/group c 64 0x030000
+11) Change the vgchange id of all (RAW) BCV disks in one VG
+  # vgchgid /dev/rdsk/c6t5d5 /dev/rdsk/c6t1d7 /dev/rdsk/c6t3d2
+12) Import the vgqas map file
+  # vgimport -m vgqas.map /dev/bcv_vgqas /dev/dsk/c6t5d5 /dev/dsk/c6t1d7 /dev/dsk/c6t3d2
+13) Activate bcv_vgqas volume group and mount all logical volumes to check if the data are accessible
+  # vgchange -a y bcv_vgqas 
+  # mkdir /mnt/dir1 
+  # mkdir /mnt/dir2 
+  # mount /dev/bcv_vgqas/lvol1 /mnt/dir1 
+  # mount /dev/bcv_vgqas/lvol2 /mnt/dir2
+14) Check if all data are accessible
+15) Destroy the current VGQAS
+  # vgexport /dev/vgqas 
+  # pvcreate -f /dev/rdsk/c6t1d6 
+  # pvcreate -f /dev/rdsk/c6t2d1 
+  # pvcreate -f /dev/rdsk/c6t2d4
+16) Recreate the new VGQAS
+  # mkdir /dev/vgqas 
+  # mknod /dev/vgqas/group c 64 0x010000 
+  # vgcreate -s 32 -e 65535 /dev/vgqas /dev/dsk/c6t1d6 /dev/dsk/c10t1d6 /dev/dsk/c6t2d1 \
+	/dev/dsk/c10t2d1 /dev/dsk/c6t2d4 /dev/dsk/c10t2d4
+17) Recreate all logical volumes based on the previous settings and format
+  # lvcreate -n lvol1 -L 262140 vgqas 
+  # lvcreate -n lvol2 -L 34096 vgqas
+18) Activate the vgqas
+  # vgchange -a y vgqas
+19) Umount bcv_vgqas LVs and do RAW disk copy from bcv_vgqas LVs to vgqas LVs
+  # umount /dev/bcv_vgqas/lvol1 
+  # umount /dev/bcv_vgqas/lvol2 
+  # dd if=/dev/bcv_vgqas/rlvol1 of=/dev/vgqas/rlvol1 bs=1024k 
+  # dd if=/dev/bcv_vgqas/rlvol2 of=/dev/vgqas/rlvol2 bs=1024k
+20) Check consistency of data that is copied. Mount the FS from VGQAS and confirm data is good and consistent.
+  # mount -a
+21) Deactivate the VGs
+  # vgchange -a n bcv_vgqas 
+  # umount /dev/vgqas/lvol1 
+  # umount /dev/vgqas/lvol2 
+  # vgchange -a n vgqas
+22) Activate vgqas and mount all logical volumes
+  # vgchange -a y vgqas # mount -a
+23) BCV disks can now be removed
+  # vxexport bcv_vgqas

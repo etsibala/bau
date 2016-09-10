@@ -1,0 +1,78 @@
+[ -- Patch Procedure for HPVM Servers -- ]
+	 document status: in progress, by etsibala_@_gmail.com
+
+~~ Assumption:
+
+HP Integrity Virtual Machine Setup:
+  - 1 Host
+  - Multiple guest OS running HP-UX instance
+
+~~ Preparation Stage:
+
+  a) Download the patch from HP-UX website
+  b) Extract the downloaded patch file or depot file in /var/tmp/patch and run the shar file.
+  c) Make sure that you have a recent ignite and data backups of the host and guest OSs
+  d) Login to host's MP with a terminal with logging
+  e) On the secondary node, verify the server state and record important server settings into a file for your reference.
+    # ./admtool-hpux.sh logchk
+    # ./admtool-hpux.sh hpinfo email
+    Try the above script [here]
+  f) Reboot all servers before starting the patching
+    1. Shutdown all guest servers
+      # shutdown -h -y 0
+    2. Reboot the host
+      # shutdown -r -y 0
+  g) Verify the server states again:
+      # ./admtool-hpux.sh logchk
+  h) Start all guest servers using "hpvmstart -P < guest_server>"
+  i) Verify all application services running on all guest servers
+  j) Shutdown all guest servers again to start patching on the host server
+
+~~ On the host server:
+
+1) Insure kernel rebuild is successful:
+  # kconfig -e /stand/system.test
+  # kconfig -i hpux_test /stand/system.test
+2) Check the state of the system patches:
+  # swlist -l fileset -a state | grep -v -e "#" -e "configured"
+3) Stop Measureware agent and kill ttd daemon
+  # mwa stop
+  # /opt/perf/bin/ttd -k
+4) Stop CDE environment and print spooler
+  # /usr/dt/bin/dtconfig -d
+  # /usr/dt/bin/dtconfig -kill
+  # lpshut
+5) Run swinstall to install the patch bundle
+  # swinstall -s /var/tmp/patch/depot
+    or
+  # swinstall -s /var/tmp/patch/patch.depot
+6) Choose reboot
+7) Verify installed patches:
+  # swlist -l bundle | grep -E -i 'gold|qpk'
+  # swlist -l product -a install_date | grep < 20090715> | awk '{print $1}'
+  # swlist -l bundle -a install_date | grep <20090715> | awk '{print $1}'
+  # swlist -a revision -l bundle "bundle name"
+8) Start Measureware agent and ttd if not running
+  # mwa status
+  # ps -ef |grep ttd
+9) Enable the CDE:
+  # /usr/dt/bin/dtconfig -e
+10) Reboot the host server:
+  # shutdown -r -y 0
+11) Do a post verification of the server state:
+  # ./admtool-hpux.sh logchk
+  # ./admtool-hpux.sh hpinfo email
+
+~~ On the guest servers:
+
+13) Start all guest servers using "hpvmstart -P < guest_server>"
+14) Login to each guest's MP with a terminal with logging using:
+  # hpvmconsole -P < guest_server>
+15) Stop any application services running on the server
+16) Start the patching using the same steps from 1 to 9
+17) Reboot the guest server
+  # shutdown -r -y 0
+18) Do a post verification of the server state:
+  # ./admtool-hpux.sh logchk
+  # ./admtool-hpux.sh hpinfo email
+19) Verify the application services

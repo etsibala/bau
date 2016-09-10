@@ -1,4 +1,4 @@
-[ -- Solaris for Bopols]
+[ -- Solaris for Bopols -- ]
 	 document status: in progress, by etsibala_@_gmail.com
 	 
 +++ System Information

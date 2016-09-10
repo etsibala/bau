@@ -1,0 +1,42 @@
+[ -- Solaris Zone Review -- ]
+	 document status: in progress, by etsibala_@_gmail.com
+	 
+~~ Main Zone type
+  - Global zone
+  - Non Global zone
+ 
+~~ Type of Non Global zones
+  - Spars root- contains selected read only portions of the global zone. Shares packages with GZ
+  - Whole root - Independent of GZ
+  - branded - Allows different versions of Solaris to be installed
+ 
+~~ Creating a ne zone
+  # zonecfg -a appserver1
+   > create
+   > set zonepath=/zone1/appserver1
+   > add net
+   > set physical=e1000g0
+   > set address=192.168.0.2
+   > end
+   > info
+   > verify
+   > commit
+   > exit
+
+~~ Listing the zones
+  # ls -la /etc/zones
+  # zoneadm list -cvi
+
+~~ Installing a zone
+  # zoneadm -z appserver1 install
+
+~~ Configuring a zone
+  # zlogin -C -e [ appserver1
+
+~~ Uninstall a zone
+  # zoneadm -z appserver1 halt
+  # zoneadm -z appserver1 uninstall
+   > y
+  # zonecfg -z appserver1 delete
+   >y
+ 

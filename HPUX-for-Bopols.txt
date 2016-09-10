@@ -1,0 +1,193 @@
+[ -- HPUX for Bopols -- ]
+	 document status: in progress, by etsibala_@_gmail.com
+	 
+	 
+Show Release/Version/Build
+  # uname -r
+  # swlist -l bundle HPUXBaseAux
+  # swlist -l bundle | grep -i mission
+
+Show Hardware
+  # model
+  # /opt/ignite/bin/print_manifest
+  # machinfo
+  # mstm
+
+Display SN/Serial Number
+  # echo "selclass qualifier system;info;wait;il" | cstm | grep "System Serial Number"
+
+Server Reboot / Shutdown
+  # shutdown -r -y 0 (Reboot)
+  # shutdown -R -y 0 (Reboot with reread config for Partitioned)
+  # shutdown -h -y 0 (Halt)
+
+Monitor CPU
+  # glance
+
+Monitor Memory
+  # ps -efl |sed '1d'|sort -nrk10 |awk '{printf("- PID:%s \t UID:%s \t %s MB \t%s %s\n", $1,$3,$10*4096/1048576,$16,$17) }' | head -50
+
+(4096 page size)
+
+Recover WTMP
+  # /usr/lib/acct/fwtmp
+
+
+User Management
+
+Unlock /disabled / Reset Password in HP-UX Trusted Mode
+  # /usr/lbin/modprpw -k userid
+  # /usr/lbin/modprpw -l -v userid
+
+
+Disk Management
+
+Search for bootable disk in initial boot loader
+ISL> search
+
+Check Current Bootpath
+  # setboot
+
+Partitioning Disk
+  # idisk
+
+Disk/Disc bad sector check
+  # dd if=/dev/dsk/<char_dev> of=/dev/null bs=1000 count=1000
+  # dd if=/dev/dsk/cxtxdx of=/dev/null bs=1024k
+
+Bad superblock / fsck
+  # fsck -b 16 /dev/vg00/lvol1
+  # fsck -b 16 /dev/dsk/c0t0d0
+
+Display Filesystem / Directory space
+  # echo "DIR: `pwd`"; du -sk * | awk '{ printf ("- %s \t\t(%sMB) \t\n",$2,$1/1024) }' | sort -t\( -n -r +1
+  # ls / |awk '{ print "if df -kl | grep " $1 ">/dev/null; then continue; else du -sk " $1 ";fi"}' |sh
+
+Volume group "" conflicts with configured mode
+  # vgchange -a n vgarch
+  # vgchange -c y vgarch
+
+Fiber Disk / Cable
+  # fcmsutil /dev/td1 | more
+  # fcmsutil /dev/td1 stat -s
+  # /opt/fcms/bin/fcddiag
+  # fcdlist
+
+Discovery New SAN EMC disk
+  # powermt config
+  # symcfg disc
+  # powermt display=all
+  # syspd list
+  # ioscan -fnC disk
+  # insf -C disk
+
+Disk Storage / SAN / EMC
+
+To sync and split BCV disksFormat:
+  # symmir -g <EMC_Disk_Group> <command>
+
+To check status:
+  # symmir -g hawkdbdg que
+  # symmir -g hawkarchdg que
+
+To start sync:
+  # symmir -g hawkdbdg est -nop
+  # symmir -g hawkarchdg est -nop
+
+To split BCV:
+Stop apps and unmount filesystem in the server side
+  # symmir -g hawkdbdg split -nop
+  # symmir -g hawkarchdg split -nop
+
+Show only EMC disk
+  # ioscan -funC disk|awk '{if($0~/disk/){if($0~/EMC/){stat=1;print $0;}}else{if(stat==1){print $0;}}}'
+
+Install EMC disk license
+  # emcpreg -install
+It will prompt type "y"
+Copy the key - BUPC-GB4W-DFJU-Q6UX-MM96-XXXX
+  # powermt set po=so
+  # powermt save
+  # powermt display dev=all
+
+Housekeep /var/opt/perf/datafiles
+  # cd /var/opt/perf/datafiles
+  # mwa stop
+  # gzip -c logappl > /var/adm/crash/logappl.gz
+  # >logappl
+  # gzip -c logdev > /var/adm/crash/logdev.gz
+  # >logdev
+  # gzip -c logglob > /var/adm/crash/logglob.gz
+  # >logglob
+  # gzip -c logindx > /var/adm/crash/logindx.gz
+  # >logindx
+  # gzip -c logproc > /var/adm/crash/logproc.gz
+  # >logproc
+  # gzip -c logtran > /var/adm/crash/logtran.gz
+  # >logtran
+  # mwa start
+
+
+Network Management
+
+Network/LAN Card
+  # lanscan
+  # lanadmin -x 0
+  # netstat -inv
+  # netstat -I lan0 -i 5
+
+Monitor Network Activity
+  # lsof
+
+Ping Source Quench
+  # ndd -get /dev/ip ip_send_source_quench
+  # ndd -set /dev/ip ip_send_source_quench 0
+  # vi /etc/rc.config.d/nddconf:
+TRANSPORT_NAME[0]=ipNDD_NAME[0]=ip_send_source_quenchNDD_VALUE[0]=0
+
+Software Management
+
+Package Managerment:
+  # swlist
+  # swinstall
+
+
+Printer Managerment
+
+Printer and queue
+To check the queue for printer lpd28 on server print0 you would run the command
+  # lpstat -h <print0> -o lpd28
+
+
+Tape Management
+
+Move Tape
+mc command http://docs.hp.com/en/B2355-90691/mc.1M.html
+
+Tape/ Ignite
+  # /usr/bin/mt -f $TAPEDEV rew && /opt/ignite/bin/make_tape_recovery $EXCLUDE \-x inc_entire=vg00 -I -Av -a $TAPEDEV
+
+Confirm data:
+a. mt –f $TAPEDEV rew (rewind the tape)
+b. mt –f $TAPEDEV fsf 1 (PARISC) (skipping LIF file block)
+mt –f $TAPEDEV fsf 22 (Itanium)
+c. tar –tvf $TAPEDEV (view ignite backup)
+
+Sample:
+
+    Rewind tape drive: mt -f /dev/rmt/0mn rewind
+    Backup directory /www and /home with tar command (z - compressed): tar -czf /dev/rmt/0mn /www /home
+    Find out what block you are at with mt command: mt -f /dev/rmt/0mn tell
+    Display list of files on tape drive: tar -tzf /dev/rmt/0mn
+    Restore /www directory: cd /mt -f /dev/rmt/0mn rewindtar -xzf /dev/rmt/0mn www
+    Unload the tape: mt -f /dev/rmt/0mn offline
+    Display status information about the tape unit: mt -f /dev/rmt/0mn status
+    Erase the tape: mt -f /dev/rmt/0mn erase
+    You can go BACKWARD or FORWARD on tape with mt command itself:
+
+
+(a) Go to end of data: mt -f /dev/rmt/0mn eod
+
+(b) Goto previous record: mt -f /dev/rmt/0mn bsfm 1
+
+(c) Forward record: mt -f /dev/rmt/0mn fsf 1

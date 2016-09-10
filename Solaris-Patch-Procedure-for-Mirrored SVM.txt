@@ -1,0 +1,183 @@
+[ -- Solaris Patch Procedure for Mirrored SVM -- ]
+     document status: in progress, by etsibala_@_gmail.com
+	 
+NOTE: Please find the following as an example only. 
+You may have some restrictions that will not allow you to follow all step and could lead you to a very bad situation.
+
+
+Assumption:
+Note: metadevice d0, d1, d2 are part of the OS filesystem.
+
+# metastat -p
+d0 -m d10 d20 1
+d10 1 1 c1t0d0s3
+d20 1 1 c1t1d0s3
+d1 -m d11 d21 1
+d11 1 1 c1t0d0s1
+d21 1 1 c1t1d0s1
+d2 -m d12 d22 1
+d12 1 1 c1t0d0s0
+d22 1 1 c1t1d0s0
+
+vfstab:
+/dev/md/dsk/d1 - - swap - no -
+/dev/md/dsk/d0 /dev/md/rdsk/d0 / ufs 1 no logging
+/dev/md/dsk/d2 /dev/md/rdsk/d2 /var ufs 1 no logging
+
+
+~~ Preparation:
+
+You can use my SOLARIS_patch-infoprep to gather SVM information before doing the patch.
+
+1) Make sure that you have a full backup of all filesystems. In case you corrupt your filesystems,
+you have the option to revert the server to its working state using the backup copy.
+
+Having the latest "explorer" output is good to have too.
+
+2) Verify that the server is in good state before patching by doing a normal reboot of server.
+  # shutdown -i6 -y -g0
+
+3) After boot-up, make sure that no software/hardware issue were detected before proceeding to the next step.
+You can check for "fail" and "error" entries in dmesg or messages log.
+
+You can also use "iostat -En |grep Hard" for any disk failures.
+
+4) Detach the mirror copies. In case you corrupt your filesystems, you have the option to revert the server to its
+working state using the mirror copies.
+  # metadetach d20 
+  # metadetach d21 
+  # metadetach d22
+
+5) Check the integrity of the detached mirror copies except for swap mirror. Fix any data errors, at your own risk :)
+  # fsck -F ufs /dev/md/rdsk/d20
+  # fsck -F ufs /dev/md/rdsk/d22
+
+6) Edit the vfstab and system files of the mirror copy. 
+   This is a necessary step in order for the server to mount the mirror filesystems properly.
+  # mount /dev/md/dsk/d20 /mnt
+  # vi /mnt/etc/vfstab
+  /dev/md/dsk/d21 - - swap - no -
+  /dev/md/dsk/d20 /dev/md/rdsk/d20 / ufs 1 no logging
+  /dev/md/dsk/d22 /dev/md/rdsk/d22 /var ufs 1 no logging
+
+  # vi /mnt/etc/system
+  rootdev:/pseudo/md@0:0,20,blk
+  
+  # umount /mnt
+
+7) Reboot the server to check the single-copy primary disk.
+  # shutdown -i6 -y -g0
+
+8) After boot-up, verify the state of the filesystems (single-copy). 
+   Make sure that no software/hardware issue were detected before proceeding to the next step.
+  # df -k / /var (Must reflect d0 and d2)
+  # swap -l (Must reflect d1) # iostat -En
+
+9) Test the detached mirror copies. Go to OBP and boot the server on mirror disk. 
+   Assuming "disk1" points to your second copy.
+  # shutdown -i0 -y -g0 ok? boot disk1
+
+10) After boot-up, verify the state of the mirror disk. 
+    Make sure that no software/hardware issue were detected before proceeding to the next step.
+  # df -k / /var (Must reflect d20 and d22)
+  # swap -l (Must reflect d21)
+  # iostat -En
+
+11) Reboot the server to boot the primary disk again.
+  # shutdown -i6 -y -g0
+
+
+~~ Start Patching
+
+12) After boot-up, verify the state of the filesystems (single-copy). 
+    Make sure that no software/hardware issue were detected before proceeding to the next step.
+  # df -k / /var (Must reflect d0 and d2)
+  # swap -l (Must reflect d1)
+  # iostat -En
+
+13) Go to single user mode and start the patching.
+  # sync; sync; init s
+
+14) Reboot the server to check the current server after patching.
+  # shutdown -i6 -y -g0
+
+15) After boot-up, verify the state of the server.
+
+
+~~ When the patching goes bad
+
+Option 1: Revert back the system state using the mirror copy
+
+1) Go to OBP and boot the server on mirror disk.
+  # shutdown -i0 -y -g0
+
+  ok? boot disk1
+
+2) After boot-up, verify the state of the mirror disks. 
+  Make sure that no software/hardware issue were detected before proceeding to the next step.
+  # df -k / /var (Must reflect d20 and d22)
+  # swap -l (Must reflect d21)
+  # iostat -En
+
+3) If dumpadm is using SVM (/dev/md/dsk/d1), replace it first with d21.
+  # dumpadm -d /dev/md/dsk/d21
+
+4) Clear d0, d1 and d2.
+  # metaclear d0 # metaclear d1 # metaclear d2
+
+5) Attach d20, d21, and d22.
+  # metainit -f d0 -m d20
+  # metainit -f d1 -m d21
+  # metainit -f d2 -m d22
+
+6) Edit the current vfstab and system files.
+  # vi /etc/vfstab
+  /dev/md/dsk/d1 - - swap - no -
+  /dev/md/dsk/d0 /dev/md/rdsk/d0 / ufs 1 no logging
+  /dev/md/dsk/d2 /dev/md/rdsk/d2 /var ufs 1 no logging
+
+  # vi /etc/system
+  rootdev:/pseudo/md@0:0,0,blk
+
+7) Go to OBP and boot the server on mirror disk again.
+  # shutdown -i0 -y -g0
+  ok? boot disk1
+
+8) After boot-up, verify that the server is now using d0, d1, and d2.
+  # df -k / /var (Must reflect d0 and d2)
+  # swap -l (Must reflect d1)
+  # iostat -En
+
+9) Attach d10, d11, and d12 to sync their data with a working copy.
+  # metattach d0 d10
+  # metattach d1 d11
+  # metattach d2 d12
+
+10) Complete the syncing before proceeding to the next step.
+  # metastat |grep sync
+
+11) After sync is complete, detach d20, d21, and d22 to make d10, d11, and d12 the primary copy again.
+  # metadetach d20
+  # metadetach d21
+  # metadetach d22
+
+12) If dumpadm is using SVM (/dev/md/dsk/d21), replace it now with d1.
+  # dumpadm -d /dev/md/dsk/d1
+
+13) Reboot the server.
+  # shutdown -i6 -y -g0
+
+14) After boot-up, verify that the server is still using d0, d1, and d2.
+  # df -k / /var (Must reflect d0 and d2)
+  # swap -l (Must reflect d1)
+  # iostat -En
+
+15) Attach d20, d21, and d22 to complete the mirroring again.
+  # metattach d0 d20
+  # metattach d1 d21
+  # metattach d2 d22
+
+16) Complete the syncing before proceeding to the next step.
+  # metastat |grep sync
+
+17) Reboot the server for the last time (Optional).

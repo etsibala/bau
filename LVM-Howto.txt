@@ -4,18 +4,31 @@
 
 +++ START LINUX SECTION ------------------------------------------------------------------- +++
 
-~~ [lnx] Create LVM logical volume
+~~ Create LVM logical volume
   # lvcreate -L 10G -n appstorelv vgdata
   # mkfs.ext3 /dev/vgdata/appstorelv
   # tune2fs -c -1 /dev/vgdata/appstorelv
 
+~~ Increase/Extend filesystem:
 
-~~ [lnx] Renaming a logical volume (LV)
+  Noted:
+  * /home filesystem is /dev/VolGroup00/LogVol01
+  * Free PE is available to extend online
+  
+  Procedure:
+  1. In the shell prompt, type:
+    # lvm lvextend -L 10GB /dev/VolGroup00/LogVol01
+  2. Resize it from filesystem level:
+    # resize2fs /dev/VolGroup00/LogVol01  (For EXT)
+    # xfs_grow /dev/VolGroup00/LogVol01	(For XFS)
+  3. Check if the change took effect:
+    # df -h /home
+
+~~ Renaming a logical volume (LV)
   # umount <FS>
   # lvrename /dev/vg02/lvold /dev/vg02/lvnew
 
-
-~~ [lnx] Reducing an existing LVM filesystem
+~~ Reducing an existing LVM filesystem
 1. Here is a sample filesystem
   # df -h /software
   /dev/mapper/rootvg-soft_lv
@@ -35,9 +48,6 @@
 
 4. The following example removes 1GB to the existing filesystem
   # resize2fs /dev/mapper/rootvg-soft_lv 98G
-  resize2fs 1.39 (29-May-2006)
-  Resizing the filesystem on /dev/mapper/rootvg-soft_lv to 25690112 (4k) blocks.
-  The filesystem on /dev/mapper/rootvg-soft_lv is now 25690112 blocks long.
 
   # lvreduce -L 98G /dev/mapper/rootvg-soft_lv
     WARNING: Reducing active logical volume to 98.00 GB
@@ -45,5 +55,26 @@
   Do you really want to reduce soft_lv? [y/n]: y
     Reducing logical volume soft_lv to 98.00 GB
     Logical volume soft_lv successfully resized
+
+~~ Reduce root filesystem:
+  Noted:
+  * root (/) filesystem is /dev/VolGroup00/LogVol00
+  * Reducing from 10GB to 5GB
+  * Make sure that the current usage of root filesystem is below 5GB
+  
+  Procedure in Red Hat System:
+  1. Boot the system from Red Hat CD
+  2. In the boot menu, type:
+      boot : linux rescue
+  3. Accept all default choices except for the part pertaining to /sys/sysimage.
+      You have to choose "skip" in order not to automatically mount the detected partition/s
+  4. In the shell prompt, type:
+      # lvm vgchange -a y
+  5. Scan the filesystem first:
+      # e2fsck -f /dev/VolGroup00/LogVol00
+  6. Resize it from filesystem level:
+      # resize2fs /dev/VolGroup00/LogVol00 5G
+  7. Next is to resize from LVM level:
+      # lvm lvreduce -L 5 /dev/VolGroup00/LogVol00
     
 +++ END LINUX SECTION ------------------------------------------------------------------- +++

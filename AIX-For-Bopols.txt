@@ -59,56 +59,59 @@ a. If not clustered:
   # snap -a -d /directory_name/ibmsupt -c  
 
 ~~ Shutdown task
-   # shutdown -Fr now (Reboot)
-   # shutdown -F (Poweroff)
+  # shutdown -Fr now (Reboot)
+  # shutdown -F (Poweroff)
 
 ~~ Monitor SWAP
-   # svmon
+  # svmon
    
 ~~ Check boot device
-   # bootlist -m normal -o
+  # bootlist -m normal -o
    
 ~~ Find HMC details
-   # lsrsrc IBM.MCP 
-   # prtconf |grep -i serial
+  # lsrsrc IBM.MCP 
+  # prtconf |grep -i serial
 
 ~~ Show VIO information
-   # echo "cvai"|kdb|grep vscsi
+  # echo "cvai"|kdb|grep vscsi
 
 ~~ Creating a logical volumes
 1. Create the logiacal volume /nsr
-	# crfs -v jfs2 -g rootvg  -m /nsr -a size=2G -A yes 
+  # crfs -v jfs2 -g rootvg  -m /nsr -a size=2G -A yes 
 	
 ~~ Extend VG filesystem
 1. Check if server is clustered
-	# lspv
+  # lspv
 	
 a. If not clustered:
-	#  lsvg rootvg
+  #  lsvg rootvg
 		- To check available free space
 	
-	# ls -l rootvg	
+  # ls -l rootvg	
 		- To show list of logical volumes
 		
-	# chfs -a size=+2G /opt
+  # chfs -a size=+2G /opt
 		- To add additional 2G to /opt
 	
 ~~ Disable a legary service
-	# chsubserver -r inetd -C /etc/inetd.conf -d -v 'telnet' -p 'tcp6'
-	# chsubserver -r inetd -C /etc/inetd.conf -d -v 'daytime' -p 'udp' 
-	# chsubserver -r inetd -C /etc/inetd.conf -d -v 'daytime' -p 'tcp'
+  # chsubserver -r inetd -C /etc/inetd.conf -d -v 'telnet' -p 'tcp6'
+  # chsubserver -r inetd -C /etc/inetd.conf -d -v 'daytime' -p 'udp' 
+  # chsubserver -r inetd -C /etc/inetd.conf -d -v 'daytime' -p 'tcp'
 	
 ~~ Remove IP address
-	# ifconfig en0 down detach
-	# rmdev -dl en0
+  # ifconfig en0 down detach
+  # rmdev -dl en0
 
 ~~ Check NIC devices
-	# lsdev -Cc adapter
-	# smitty tcpip
+  # lsdev -Cc adapter
+  # smitty tcpip
 
-	
 ~~ Account Setup
-	# useradd -m tmpadm
-	# chuser expires=0 tmpadm
-	# pwdadm -c tmpadm
-	# passwd tmpadm
+  # useradd -m tmpadm
+  # chuser expires=0 tmpadm
+  # pwdadm -c tmpadm
+  # passwd tmpadm
+
+~~ Make password with more than 8 character long
+  # vi /etc/security/login.cfg
+     add: pwd_algorithm = smd5

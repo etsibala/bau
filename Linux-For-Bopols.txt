@@ -142,6 +142,7 @@
 
 
 +++ Network Management 
+
 ~~ Check for port user
   # lsof -i :5000 (check for port 5000)
   COMMAND  PID USER   FD   TYPE DEVICE SIZE/OFF NODE NAME
@@ -152,6 +153,35 @@
   # ethtool -s eth0 speed 100 duplex full OR mii-tool -F 10baseT-HD	(setting NIC speeds)
   # ip route	(display route)
   # ip address	(display address)
+
+~~ Network Inteface Bonding in Red Hat
+  Note:
+  bond0 - Virtual interface to be bonded with eth0 and eth1
+  dhcp - connection to use is dhcp
+  
+  Procedure:
+  1. Edit /etc/modprobe.conf
+      # vi /etc/modprobe.conf
+          alias bond0 bonding
+  2. Edit /etc/sysconfig/network-scripts/ifcfg-eth0
+      # vi /etc/sysconfig/network-scripts/ifcfg-eth0
+          DEVICE=eth0
+          ONBOOT=yes
+          MASTER=bond0
+          SLAVE=yes
+  3. Edit /etc/sysconfig/network-scripts/ifcfg-eth1
+      # vi /etc/sysconfig/network-scripts/ifcfg-eth1
+          DEVICE=eth1
+          ONBOOT=yes
+          MASTER=bond0
+          SLAVE=yes
+  4. Edit /etc/sysconfig/network-scripts/ifcfg-bond0
+      # vi /etc/sysconfig/network-scripts/ifcfg-bond0
+          DEVICE=bond0
+          ONBOOT=yes
+          BOOTPROTO=dhcp
+  5. Restart network services
+      # service network restart
 
 
 +++ Software Management

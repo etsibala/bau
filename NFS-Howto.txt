@@ -42,5 +42,20 @@
 6. Verify the access permission
    # touch /nfsshare/testfile
    # ls -l /nfsshare/testfile
+
+~~ Linux AUTOFS and NFS client Setup
+1. Enable AUTOFS logging in /etc/sysconfig/autofs. 
+   This is to have automount service logging in “/var/log/messages”  
+2. Configure AUTOFS maps with "intr" and "soft" nfs options. 
+   This is to allow interruption of nfs request if needed and 
+   make the kernel logs an error in “/var/log/messages” when an NFS mount suddenly becomes inaccessible after 5mins.
+  # cat /etc/auto.master
+  /-        /etc/auto.nfs
+
+  # cat /etc/auto.nfs
+  /mnt/data       -fstype=nfs,rw,intr,soft         nfsserver:/export/share
+
+3. Start the AUTOFS service
+    # service autofs start
    
 +++ END LINUX SECTION ------------------------------------------------------------------- +++

@@ -191,3 +191,4 @@ Sample:
 (b) Goto previous record: mt -f /dev/rmt/0mn bsfm 1
 
 (c) Forward record: mt -f /dev/rmt/0mn fsf 1
+

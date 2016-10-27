@@ -143,6 +143,12 @@
 
 +++ Network Management 
 
+~~ Modify eth mapping
+  # vi /etc/udev/rules.d/70-persistent-net.rules
+    - Find the rule matching your MAC address. Change the NAME value from eth1 to eth0 
+    i.e. NAME="eth0" 
+    - To apply changes without restarting run sudo udevadm trigger.
+
 ~~ Check for port user
   # lsof -i :5000 (check for port 5000)
   COMMAND  PID USER   FD   TYPE DEVICE SIZE/OFF NODE NAME

@@ -1,7 +1,6 @@
 [ -- AIX for Bopols -- ]
      document status: in progress, by etsibala_@_gmail.com
 
-	 
 ~~ Changing timezone
   # smitty chtz_date
 

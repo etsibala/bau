@@ -1,61 +1,77 @@
 
-[ -- NFS Howto --- ]
-     document status: in progress, by etsibala_@_gmail.com
+###############
+## NFS Howto ##
+###############
+# status: progress
 
-+++ START LINUX SECTION ------------------------------------------------------------------- +++
+### [ START LINUX SECTION ]
 
-~~ [lnx] Setting up NFS server on RHEL7
-1. Install required packages
-   # yum -y nfs-utils
-2. Setup the shared folder
-   # vi /etc/exports
-   eg.
-   /share clienthost1(rw,no_root_squash,sync,no_subtree_check) clienthost2(rw,no_root_squash,sync,no_subtree_check)
-3. Enable the required packages
-   # systemctl enable rpcbind
-   # systemctl enable nfs-server
-4. Start the required packages. By default, it support NFSv3 and NFSv4. To change it, edit /etc/sysconfig/nfs.
-   # systemctl start rpcbind
-   # systemctl start nfs-server
-5. Make sure firewall is not blocking
-   # iptables -L
-6. Verify that the share is visible
-   # showmount -e
+  - name: Setting up NFS server on RHEL7
+
+    desc: Install required packages
+    command: yum -y nfs-utils
+	
+    desc: Setup the shared folder
+    command: vi /etc/exports
+    add:
+    /share clienthost1(rw,no_root_squash,sync,no_subtree_check) clienthost2(rw,no_root_squash,sync,no_subtree_check)
+
+    desc: Enable the required packages
+    command: systemctl enable rpcbind
+             systemctl enable nfs-server
+
+    desc: Start the required packages. By default, it support NFSv3 and NFSv4. To change it, edit /etc/sysconfig/nfs.
+    command: systemctl start rpcbind
+             systemctl start nfs-server
+   
+    desc: Make sure firewall is not blocking
+    command: iptables -L
+   
+    desc: Verify that the share is visible
+    command: showmount -e
 
 
-~~ [lnx] Setting up NFS client on RHEL7
-1. Install required packages
-   # yum -y nfs-utils
-2. Enable and start below service to support mounting during bootup
-   # systemctl start remote-fs.target
-   # systemctl enable remote-fs.target   
-3. Verify that the share is accessible
-   # showmount -e <nfs_server>
-4. Add the share /etc/fstab
-   # vi /etc/fstab
-   eg.
+  - name: Setting up NFS client on RHEL7
+  
+    desc: Install required packages
+    command: yum -y nfs-utils
+   
+    desc: Enable and start below service to support mounting during bootup
+    command: systemctl start remote-fs.target
+             systemctl enable remote-fs.target   
+   
+    desc: Verify that the share is accessible
+    command: showmount -e <nfs_server>
+   
+    desc: Add the share /etc/fstab
+    command: vi /etc/fstab
+    add:
     <nfs_server>:/share /nfsshare	nfs	rw,bg,hard,nointr,tcp,vers=3,timeo=300,rsize=32768,wsize=32768
     <nfs_server>:/share /nfsshare	nfs4	rw,bg,hard,nointr,tcp,timeo=300,rsize=32768,wsize=32768
-5. Mount the shared folder
-   # mkdir /nfsshare
-   # mount /nfsshare
-6. Verify the access permission
-   # touch /nfsshare/testfile
-   # ls -l /nfsshare/testfile
-
-~~ Linux AUTOFS and NFS client Setup
-1. Enable AUTOFS logging in /etc/sysconfig/autofs. 
-   This is to have automount service logging in “/var/log/messages”  
-2. Configure AUTOFS maps with "intr" and "soft" nfs options. 
-   This is to allow interruption of nfs request if needed and 
-   make the kernel logs an error in “/var/log/messages” when an NFS mount suddenly becomes inaccessible after 5mins.
-  # cat /etc/auto.master
-  /-        /etc/auto.nfs
-
-  # cat /etc/auto.nfs
-  /mnt/data       -fstype=nfs,rw,intr,soft         nfsserver:/export/share
-
-3. Start the AUTOFS service
-    # service autofs start
+	
+    desc: Mount the shared folder
+    command: mkdir /nfsshare
+    mount /nfsshare
    
-+++ END LINUX SECTION ------------------------------------------------------------------- +++
+    desc: Verify the access permission
+    command: touch /nfsshare/testfile
+             ls -l /nfsshare/testfile
+
+			 
+  - name: Linux AUTOFS and NFS client Setup
+  
+    desc: Enable AUTOFS logging in /etc/sysconfig/autofs. 
+          This is to have automount service logging in "/var/log/messages"
+   
+    desc: Configure AUTOFS maps with "intr" and "soft" nfs options. 
+          This is to allow interruption of nfs request if needed and 
+          make the kernel logs an error in "/var/log/messages" when an NFS mount suddenly becomes inaccessible after 5mins.
+    command: cat /etc/auto.master
+             /-        /etc/auto.nfs
+
+             cat /etc/auto.nfs
+             /mnt/data       -fstype=nfs,rw,intr,soft         nfsserver:/export/share
+
+    desc: Start the AUTOFS service
+    command: service autofs start
+   

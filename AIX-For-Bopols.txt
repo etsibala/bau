@@ -1,9 +1,98 @@
-### AIX for Bopols 
-- document status: in progress, by etsibala_@_gmail.com
+
+######################
+### AIX for Bopols ###
+######################
+# status: defunc
+
+
+### [ GENERAL ]
 
   - name: Changing timezone
-    desc: 
     command: smitty chtz_date
+
+  - name: Disable a legary service
+    command: chsubserver -r inetd -C /etc/inetd.conf -d -v 'telnet' -p 'tcp6'
+             chsubserver -r inetd -C /etc/inetd.conf -d -v 'daytime' -p 'udp' 
+             chsubserver -r inetd -C /etc/inetd.conf -d -v 'daytime' -p 'tcp'
+	
+  - name: Remove IP address
+    command: ifconfig en0 down detach
+            rmdev -dl en0
+
+  - name: Check NIC devices
+    command: lsdev -Cc adapter
+             smitty tcpip
+             entstat -d ent18 
+             lsattr -El ent18
+             lscfg -vpl ent0
+
+  - name: Remove IP address
+    command: ifconfig en0 down detach
+             rmdev -dl en0
+
+  - name: Scan for new devices
+    command: cfgmgr -v
+	
+  - name: Check disk devils
+    command: lscfg -vpl hdisk1041
+  
+  - name: Account Setup
+    command: useradd -m tmpadm
+             chuser expires=0 tmpadm
+             pwdadm -c tmpadm
+             passwd tmpadm
+
+  - name: Managing services
+    command: stopsrc -s sshd
+             startsrc -s sshd
+
+  - name: Show dump details
+    command: sysdumpdev -e
+             sysdumpdev -L
+
+  - name: Generating snap report
+    command: snap -r (clears any previous snap output in /tmp/ibmsupt)
+             snap -ac (this is for system crashes/hangs, default /tmp location will be used)
+             snap -a -d /directory_name/ibmsupt -c  
+
+  - name: Shutdown task
+    command: shutdown -Fr now (Reboot)
+             shutdown -F (Poweroff)
+
+  - name: Monitor SWAP
+    command: svmon
+   
+  - name: Check boot device
+    command: bootlist -m normal -o
+   
+  - name: Find HMC details
+    command: lsrsrc IBM.MCP 
+             prtconf |grep -i serial
+
+  - name: Show VIO information
+    command: echo "cvai"|kdb|grep vscsi
+	
+  - name: Disable a legacy service
+    command: chsubserver -r inetd -C /etc/inetd.conf -d -v 'telnet' -p 'tcp6'
+             chsubserver -r inetd -C /etc/inetd.conf -d -v 'daytime' -p 'udp' 
+             chsubserver -r inetd -C /etc/inetd.conf -d -v 'daytime' -p 'tcp'
+
+  - name: Check NIC devices
+    command: lsdev -Cc adapter
+             smitty tcpip
+
+  - name: Account Setup
+    command: useradd -m tmpadm
+             chuser expires=0 tmpadm
+             pwdadm -c tmpadm
+             passwd tmpadm
+
+  - name: Make password with more than 8 character long
+    command: vi /etc/security/login.cfg
+    add: pwd_algorithm = smd5
+	 
+	 
+### [ Logical Volume Management ]
 
   - name: Creating a logical volumes
     desc: Create the logiacal volume /nsr
@@ -13,106 +102,11 @@
     desc: Check if server is clustered
     command: lspv
 	
-    desc: If not clustered:]
-    command: lsvg rootvg (To check available free space)
-             ls -l rootvg (To show list of logical volumes)
-             chfs -a size=+2G /opt (To add additional 2G to /opt)
+    desc: If not clustered, to check available free space
+    command:  lsvg rootvg
 	
-~~ Disable a legary service
-  # chsubserver -r inetd -C /etc/inetd.conf -d -v 'telnet' -p 'tcp6'
-  # chsubserver -r inetd -C /etc/inetd.conf -d -v 'daytime' -p 'udp' 
-  # chsubserver -r inetd -C /etc/inetd.conf -d -v 'daytime' -p 'tcp'
+    desc: To show list of logical volumes
+    command: ls -l rootvg	
 	
-~~ Remove IP address
-  # ifconfig en0 down detach
-  # rmdev -dl en0
-
-~~ Check NIC devices
-  # lsdev -Cc adapter
-  # smitty tcpip
-  # entstat -d ent18 
-  # lsattr -El ent18
-  # lscfg -vpl ent0
-
-~~ Scan for new devices
-  # cfgmgr -v
-	
-~~ Check disk devils
-  #  lscfg -vpl hdisk1041
-  
-~~ Account Setup
-  # useradd -m tmpadm
-  # chuser expires=0 tmpadm
-  # pwdadm -c tmpadm
-  # passwd tmpadm
-
-~~ Managing services
-  # stopsrc -s sshd
-  # startsrc -s sshd
-
-~~ Show dump details
-  # sysdumpdev -e
-  # sysdumpdev -L
-
-~~ Generating snap report
-  # snap -r (clears any previous snap output in /tmp/ibmsupt)
-  # snap -ac (this is for system crashes/hangs, default /tmp location will be used)
-  # snap -a -d /directory_name/ibmsupt -c  
-
-~~ Shutdown task
-  # shutdown -Fr now (Reboot)
-  # shutdown -F (Poweroff)
-
-~~ Monitor SWAP
-  # svmon
-   
-~~ Check boot device
-  # bootlist -m normal -o
-   
-~~ Find HMC details
-  # lsrsrc IBM.MCP 
-  # prtconf |grep -i serial
-
-~~ Show VIO information
-  # echo "cvai"|kdb|grep vscsi
-
-~~ Creating a logical volumes
-1. Create the logiacal volume /nsr
-  # crfs -v jfs2 -g rootvg  -m /nsr -a size=2G -A yes 
-	
-~~ Extend VG filesystem
-1. Check if server is clustered
-  # lspv
-	
-a. If not clustered:
-  #  lsvg rootvg
-		- To check available free space
-	
-  # ls -l rootvg	
-		- To show list of logical volumes
-		
-  # chfs -a size=+2G /opt
-		- To add additional 2G to /opt
-	
-~~ Disable a legary service
-  # chsubserver -r inetd -C /etc/inetd.conf -d -v 'telnet' -p 'tcp6'
-  # chsubserver -r inetd -C /etc/inetd.conf -d -v 'daytime' -p 'udp' 
-  # chsubserver -r inetd -C /etc/inetd.conf -d -v 'daytime' -p 'tcp'
-	
-~~ Remove IP address
-  # ifconfig en0 down detach
-  # rmdev -dl en0
-
-~~ Check NIC devices
-  # lsdev -Cc adapter
-  # smitty tcpip
-
-~~ Account Setup
-  # useradd -m tmpadm
-  # chuser expires=0 tmpadm
-  # pwdadm -c tmpadm
-  # passwd tmpadm
-
-~~ Make password with more than 8 character long
-  # vi /etc/security/login.cfg
-     add: pwd_algorithm = smd5
+    desc: To add additional 2G to /opt
+    command: chfs -a size=+2G /opt

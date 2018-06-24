@@ -1,0 +1,57 @@
+### RHCE Review
+--- Account management
+# useradd user01
+# groupadd -g 5000 staff
+# groupadd -r appusers
+# groupmod -n javausers appusers
+# groupmod -g 6000 staff
+# usermod -G whell elvis
+# usermod -s /sbin/nologin user01
+# date -d "+45 days"
+# chage -d 0 username (force password update on login)
+# chage -l username (list current settings)
+# chage -E 2017-04-04 username (expire on on specific day)
+# chage -U username (lock account)
+# chage -M 90 user01 (password change ever 90 days)
+
+--- LDAP configuration
++ Setup LDAP server: https://www.certdepot.net/rhel7-configure-ldap-directory-service-user-connection/
++ Setup LDAP client
+# yum -y install authconfig-gtk sssd krb5-workstation
+# yum install -y openldap-clients nss-pam-ldapd
+# authconfig --enableforcelegacy --update
+# openssl req -new -x509 -nodes -out /etc/openldap/cacerts/cert.pem -keyout /etc/openldap/cacerts/priv.pem -days 365
+# authconfig --enableldap --enableldapauth --ldapserver="server1.gen10s.com" --ldapbasedn="dc=gen10s,dc=com" --update
+# restart something...
+
+--- File permission
+# getfacl ...
+# setfacl ...
+
+- Process Management
+# systemctl list-units --type=service
+# systemctl list-unit-files
+# systemctl <start|stop|reload|is-enabled|is-active> <name.type>
+# systemctl list-dependencies <name.type>
+
+--- Boot Process
++ Recover root password
+   1. Add "rd.break" at grub bootup menu
+   2. mount -o remount,rw /sysroot
+   3. chroot /sysroot
+   4. passwd root
+   5. touch /.autorelabel
+# systemctl poweroff
+# systemctl reboot
+# systemctl get-default
+# systemctl set-default <graphical.target|multi-user.target|rescue.target|emergency.target>
+# systemctl isolate <graphica.target|multi-user.target|rescue.target|emergency.target>
++ Add "systemd.unit=rescue.target" at grub bootup menu
+
+--- Network Management
+# ip addr show
+# ip addr list
+# ip route
+# ip -s link show
+# ss -ta
+

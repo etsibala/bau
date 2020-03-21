@@ -1,0 +1,69 @@
+1. User an ordinary account to create an RPM
+su - user1
+
+2. Install the RPM build tools package
+$ sudo yum install rpm-build rpmdevtools
+
+3. Build the directory structure
+$ rpmdev-setuptree
+
+4. Edit %packager value 
+$ vi ~/.rpmmacros
+%packager YOUR_NAME
+
+%_topdir %(echo $HOME)/rpmbuild
+
+%_smp_mflags %( \
+    [ -z "$RPM_BUILD_NCPUS" ] \\\
+        && RPM_BUILD_NCPUS="`/usr/bin/nproc 2>/dev/null || \\\
+                             /usr/bin/getconf _NPROCESSORS_ONLN`"; \\\
+    if [ "$RPM_BUILD_NCPUS" -gt 16 ]; then \\\
+        echo "-j16"; \\\
+    elif [ "$RPM_BUILD_NCPUS" -gt 3 ]; then \\\
+        echo "-j$RPM_BUILD_NCPUS"; \\\
+    else \\\
+        echo "-j3"; \\\
+    fi )
+
+%__arch_install_post \
+    [ "%{buildarch}" = "noarch" ] || QA_CHECK_RPATHS=1 ; \
+    case "${QA_CHECK_RPATHS:-}" in [1yY]*) /usr/lib/rpm/check-rpaths ;; esac \
+    /usr/lib/rpm/check-buildroot
+
+5. Create the tar file of the script/s	for the RPM
+$ cd ~/rpmbuild/SOURCES
+$ tar -cvf scripts-1.tar scripts-1
+
+6. Create the spec file for the RPM
+$ vi ~/rpmbuild/SPECS/scriptrpm.spec
+Name:           script
+Version:        1
+Release:        0
+Summary:        A Test script RPM
+
+Group:          DCTECH
+BuildArch:      noarch
+License:        GPL
+URL:            https://github.com/etsibala
+Source0:        script-1.tar
+
+%description
+Write some description about your package here
+
+%prep
+%setup -q
+%build
+%install
+install -m 0755 -d $RPM_BUILD_ROOT/tmp/dctech/script
+install -m 0700 script.sh $RPM_BUILD_ROOT/tmp/dctech/script/script.sh
+
+%files
+/tmp/dctech
+/tmp/dctech/script
+/tmp/dctech/script/script.sh
+
+%changelog
+* Tue Oct 24 2017 Uginv39  1.0.0
+  - Initial rpm release
+
+$ rpmbuild -ba SPECS/mydumpadmin.spec

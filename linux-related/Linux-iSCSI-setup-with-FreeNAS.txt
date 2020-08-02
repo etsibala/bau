@@ -1,0 +1,25 @@
+### Linux iSCSI setup with FreeNAS
+dated: 20150716
+
+Requirements:
+* 1 FreeNAS 9.3 Virtual Machine
+    - 2GB memory
+    - 20GB OS disk
+    - 40GB data disk
+* 1 Centos 7 Virtual Machine
+    - 1GB memory
+    - 20GB OD disk
+
+Procedure:
+1. Install FreeNAS 9.3
+    IP address: 192.168.122.14
+2. Setup iSCSI
+3. Install Centos 6.3
+4. Setup iscsi connection
+    # yum install iscsi-initiator-utils
+    # vi /etc/iscsi/iscsi.conf
+        node.session.auth.username = user01
+        node.session.auth.password = user01@svr143
+    # iscsiadm -m discovery -t sendtargets -p 192.168.122.14
+    # systemctl start iscsi.service
+    # fdisk -l
